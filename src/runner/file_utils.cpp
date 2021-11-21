@@ -11,10 +11,11 @@ using namespace std;
 // Really basic way to parse a line based on delimiters. 
 // parameters:
 //  input = the input string to split. assume newline is removed, or else it will be addded to the last item
-//  delimiter = the value to split on
+//  delimiters = the values to split on
+//  num_delimiters = the number of delimiters in the list
 //  quote = an optional parameter - a quote character to indicate a that quoted sections will be used and ignore delimiters
 //  comment_char = an optional parameter - if this is the first character in a line, that line is treated as a comment and skipped.
-vector<string> FileUtils::split_line_to_strings(string input, char delimiter, char quote_char, char comment_char)
+vector<string> FileUtils::split_line_to_strings(string input, char * delimiters, int num_delimiters, char quote_char, char comment_char)
 {
 #ifdef DEBUG_RUNNER
     cout << "original input is [" << input << "]" << endl;
@@ -33,6 +34,7 @@ vector<string> FileUtils::split_line_to_strings(string input, char delimiter, ch
     }
     
     bool in_quote = false;
+    bool last_matched = false;
     ostringstream current;
     while (*pos != '\0')
     {
@@ -59,21 +61,37 @@ vector<string> FileUtils::split_line_to_strings(string input, char delimiter, ch
                 cout << "In quotes" << endl;
 #endif
             }
-            else if (*pos == delimiter)
-            {
-                // ABCDE,ABCDE,ABCDE
-                // first string goes from 0 to 4...construct as string(0,5). pos will be 5 for the comma. so 5-0=5
-                // second string goes from 6 to 10...construct as string(6,5)...pos wil be 11 for the comma. so 11-6=5
-                // third string goes from 12 to 16...construct as string(12,5) but need to do this out of loop as its the last string
-#ifdef DEBUG_RUNNER
-                cout << "appending [" << current.str() << "] as a string" << endl;
-#endif
-                splits.push_back(current.str());
-                current = ostringstream();
-            }
             else
             {
-                current << (*pos);
+                bool matched = false;
+                for (int i=0; i<num_delimiters; i++)
+                {
+                    if (*pos == delimiters[i])
+                    {
+                        matched = true;
+                    }
+                }
+                if (matched)
+                {
+                    if (!last_matched)
+                    {
+                        // ABCDE,ABCDE,ABCDE
+                        // first string goes from 0 to 4...construct as string(0,5). pos will be 5 for the comma. so 5-0=5
+                        // second string goes from 6 to 10...construct as string(6,5)...pos wil be 11 for the comma. so 11-6=5
+                        // third string goes from 12 to 16...construct as string(12,5) but need to do this out of loop as its the last string
+    #ifdef DEBUG_RUNNER
+                        cout << "appending [" << current.str() << "] as a string" << endl;
+    #endif
+                        splits.push_back(current.str());
+                        current = ostringstream();
+                        last_matched = true;
+                    }
+                }
+                else
+                {
+                    current << (*pos);
+                    last_matched = false;
+                }
             }
         }
         pos++;
@@ -106,7 +124,29 @@ bool FileUtils::read_as_list_of_strings(string filename, vector<string> & lines)
     return true;
 }
 
+bool FileUtils::read_as_list_of_longs(string filename, vector<long> & values)
+{
+    vector<string> lines;
+    if (!read_as_list_of_strings(filename, lines))
+    {
+        return false;
+    }
+    
+    for (int i=0; i<lines.size(); i++)
+    {
+        values.push_back(strtol(lines[i].c_str(), NULL, 10));
+    }
+    
+    return true;
+}
+
+
 bool FileUtils::read_as_list_of_split_strings(string filename, vector<vector<string>> & split_strings, char delimiter, char quote_char, char comment_char)
+{
+    return read_as_list_of_split_strings(filename, split_strings, &delimiter, 1, quote_char, comment_char);
+}
+
+bool FileUtils::read_as_list_of_split_strings(string filename, vector<vector<string>> & split_strings, char * delimiters, int num_delimiters, char quote_char, char comment_char)
 {
     vector<string> lines;
     if (!read_as_list_of_strings(filename, lines))
@@ -115,7 +155,7 @@ bool FileUtils::read_as_list_of_split_strings(string filename, vector<vector<str
     }
     for (vector<string>::iterator iter = lines.begin(); iter != lines.end(); ++iter)
     {
-        vector<string> results = split_line_to_strings(*iter, delimiter, quote_char, comment_char);
+        vector<string> results = split_line_to_strings(*iter, delimiters, num_delimiters, quote_char, comment_char);
         if (results.size() > 0)
             split_strings.push_back(results);
     }
@@ -124,6 +164,11 @@ bool FileUtils::read_as_list_of_split_strings(string filename, vector<vector<str
 
 bool FileUtils::read_as_list_of_split_longs(string filename, vector<vector<long>> & split_longs, char delimiter, char quote_char, char comment_char)
 {
+    return read_as_list_of_split_longs(filename, split_longs, &delimiter, 1, quote_char, comment_char);
+}
+
+bool FileUtils::read_as_list_of_split_longs(string filename, vector<vector<long>> & split_longs, char * delimiters, int num_delimiters, char quote_char, char comment_char)
+{
     vector<string> lines;
     if (!read_as_list_of_strings(filename, lines))
     {
@@ -131,7 +176,7 @@ bool FileUtils::read_as_list_of_split_longs(string filename, vector<vector<long>
     }
     for (vector<string>::iterator iter = lines.begin(); iter != lines.end(); ++iter)
     {
-        vector<string> long_strings = split_line_to_strings(*iter, delimiter, quote_char, comment_char);
+        vector<string> long_strings = split_line_to_strings(*iter, delimiters, num_delimiters, quote_char, comment_char);
         vector<long> longs;
         for (vector<string>::iterator str_long_iter = long_strings.begin(); str_long_iter != long_strings.end(); ++str_long_iter)
         {
