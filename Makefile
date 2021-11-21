@@ -5,7 +5,7 @@ DEBUG=
 #DEBUG+- -DDEBUG_OTHER
 
 #If adding another include directory, be sure to add it here
-CPPFLAGS=-g ${DEBUG} -Iinclude/common -Iinclude/runner -Iinclude/solutions
+CPPFLAGS=-g ${DEBUG} -Iinclude/common -Iinclude/runner -Iinclude/screen -Iinclude/solutions
 
 .DEFAULT_GOAL := all
 
@@ -30,6 +30,19 @@ bin/lib/librunner.a: build/runner/aoc_test.o  \
 	build/runner/aoc_tests.o  \
 	build/runner/file_utils.o
 	ar rcs bin/lib/librunner.a build/runner/aoc_test.o build/runner/aoc_tests.o build/runner/file_utils.o
+
+# Screen libary - contains the screen and screen overlay functionality for game-of-life like problems
+build/screen/screen.o: src/screen/screen.cpp  \
+	include/screen/screen.h
+	g++ ${CPPFLAGS} -o build/screen/screen.o -c src/screen/screen.cpp
+
+build/screen/overlay.o: src/screen/overlay.cpp  \
+	include/screen/overlay.h
+	g++ ${CPPFLAGS} -o build/screen/overlay.o -c src/screen/overlay.cpp
+
+bin/lib/libscreen.a: build/screen/screen.o  \
+	build/screen/overlay.o
+	ar rcs bin/lib/libscreen.a build/screen/screen.o build/screen/overlay.o
 
 # Solutions - These are the programs for the daily solutions
 build/solutions/aoc_day.o: src/solutions/aoc_day.cpp  \
@@ -67,6 +80,7 @@ build/aoc.o: src/aoc.cpp  \
 #If adding a new library, be sure to add it in the correct order in the compile line
 bin/aoc: build/aoc.o  \
 	bin/lib/librunner.a \
+	bin/lib/libscreen.a \
 	bin/lib/libsolutions.a
 	g++ ${CPPFLAGS} -o bin/aoc build/aoc.o -Lbin/lib -lsolutions -lrunner
 
@@ -74,21 +88,27 @@ clean:
 	rm -f build/runner/aoc_test.o  \
 	build/runner/aoc_tests.o  \
 	build/runner/file_utils.o  \
+	build/screen/screen.o  \
+	build/screen/overlay.o  \
 	build/solutions/aoc_day.o  \
 	build/solutions/aoc_day_0.o  \
 	build/solutions/aoc_days.o  \
 	build/aoc.o  \
 	bin/lib/librunner.a  \
+	bin/lib/libscreen.a  \
 	bin/lib/libsolutions.a  \
 	bin/aoc
 
 all: build/runner/aoc_test.o  \
 	build/runner/aoc_tests.o  \
 	build/runner/file_utils.o  \
+	build/screen/screen.o  \
+	build/screen/overlay.o  \
 	build/solutions/aoc_day.o  \
 	build/solutions/aoc_day_0.o  \
 	build/solutions/aoc_days.o  \
 	build/aoc.o  \
 	bin/lib/librunner.a  \
+	bin/lib/libscreen.a  \
 	bin/lib/libsolutions.a  \
 	bin/aoc
