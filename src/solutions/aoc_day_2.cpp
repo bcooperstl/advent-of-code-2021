@@ -88,3 +88,30 @@ string AocDay2::part1(string filename, vector<string> extra_args)
     out << horizonal_position * depth;
     return out.str();
 }
+
+string AocDay2::part2(string filename, vector<string> extra_args)
+{
+    vector<Command> commands = parse_input(filename);
+    int horizonal_position = 0;
+    int depth = 0;
+    int aim = 0;
+    for (int i=0; i<commands.size(); i++)
+    {
+        switch (commands[i].operation)
+        {
+            case Forward:
+                horizonal_position += commands[i].amount;
+                depth += (aim * commands[i].amount);
+                break;
+            case Down:
+                aim += commands[i].amount;
+                break;
+            case Up:
+                aim -= commands[i].amount;
+                break;
+        }
+    }
+    ostringstream out;
+    out << horizonal_position * depth;
+    return out.str();
+}
