@@ -39,7 +39,7 @@ There is [one example](../data/test_cases/day3_test1.txt) provided showing sampl
 - Parse the input to a vector of *data*
     - Converting each input from binary to a decimal numbers.
     - Also note the number of binary digits in each input and store in *length*
-- Initialize an array of *len* items called *ones* to start at 0. This will correspond to the number of one values at each position.
+- Initialize an array of *length* items called *ones* to start at 0. This will correspond to the number of one values at each position.
 - Loop over each item in *data*
     - Loop over each bit with *i*
         - If the *i*th bit is a 1, increment *ones*[i]
