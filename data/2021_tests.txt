@@ -3,3 +3,7 @@
 1,1,day1_input.txt,1390
 1,2,test_cases/day1_test1.txt,5
 1,2,day1_input.txt,1457
+2,1,test_cases/day2_test1.txt,150
+2,1,day2_input.txt,1427868
+2,2,test_cases/day2_test1.txt,900
+2,2,day2_input.txt,1568138742
