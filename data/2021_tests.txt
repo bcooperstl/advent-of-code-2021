@@ -8,3 +8,4 @@
 2,2,test_cases/day2_test1.txt,900
 2,2,day2_input.txt,1568138742
 3,1,test_cases/day3_test1.txt,198
+3,1,day3_input.txt,2724524
