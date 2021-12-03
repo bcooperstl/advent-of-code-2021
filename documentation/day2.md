@@ -64,4 +64,5 @@ A vector of the commands will be returned.
 
 ## Things I learned ##
 
+Re-introducing myself to working with c++ namespaces in my Advent Of Code projects so I don't have to worry about name conflicts.
 
