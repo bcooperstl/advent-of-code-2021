@@ -44,7 +44,7 @@ Integer of the calculated product as described in the Part 2 Requirements.
 
 ### Given Test Cases ###
 
-There is [one example](../data/test_cases/day1_test1.txt) provided showing sample case.
+There is [one example](../data/test_cases/day2_test1.txt) provided showing sample case.
 
 ### Custom Test Cases ###
 
