@@ -12,6 +12,18 @@ Output the power consumption (gamma rate \* epsilon rate) as a decimal value.
 
 ## Part 2 Requirements ##
 
+Calculate the oxygen generator rating and CO2 scrubber rating from the diagnostic report, as described in the input format.
+
+Each of these is calculated by a similar, but different, iterative process, starting with the first bit and then progressing.
+
+For the oxygen generator rating, look at the most common value in the current bit position, and only keep numbers matching that value.
+If there are equal 1s and 0s, keep the values with a 1.
+
+For the CO2 scrubber rating, look at the least common value in the current bit position, and only keep numbers matching that value.
+If there are equal 1s and 0s, keep the values with a 0.
+
+Output the power consumption (oxygen generator rating \* CO2 scrubber rating) as a decimal value.
+
 ### Input Format ###
 
 A diagnostic report, consiting of a list of binary numbers, one per line.
@@ -36,6 +48,10 @@ There is [one example](../data/test_cases/day3_test1.txt) provided showing sampl
 
 ## Approach ##
 
+### Part 1 ###
+
+#### Main Program ####
+
 - Parse the input to a vector of *data*
     - Converting each input from binary to a decimal numbers.
     - Also note the number of binary digits in each input and store in *length*
@@ -55,6 +71,53 @@ There is [one example](../data/test_cases/day3_test1.txt) provided showing sampl
     - Else
         - Throw an error. Something's wrong or ambiguous
 - **Output** the power consumption of *gamma* \* *epsilon*
+
+### Part 2 ###
+
+#### Main Program ####
+
+- Parse the input to a vector of *data*
+    - Converting each input from binary to a decimal numbers.
+    - Also note the number of binary digits in each input and store in *length*
+- Call the Calculate Oxygen Generator Rating function, storing the result in *oxygen*
+- Call the Calculate CO2 Scrubber Rating function, storing the result in *carbon*
+- **Output** the life support rating of *oxygen* \* *carbon*
+
+#### Calculate Oxygen Generator Rating Function ####
+Input:  vector of data, length 
+
+Output: single item that is the oxygen generator rating
+
+- Loop over each bit with *i* until *data* only has one item
+    - Create empty vectors *zeros* and *ones*
+    - Loop over each item in *data*
+        - if the *i*th bit in *item* is a one
+            - add it to the *ones* vector
+        - else the *ith* bit is a zero
+            - add it to the *zeros* vector
+    - if there number of elements in *ones* is greater than or equal to the number of elements in *zeros*
+        - set *data* to *ones*
+    - else
+        - set *data* to *zeros*
+- Return the only element in *data*
+
+#### Calculate CO2 Scrubber Rating Function ####
+Input:  vector of data, length 
+
+Output: single item that is the CO2 scrubber rating
+
+- Loop over each bit with *i* until *data* only has one item
+    - Create empty vectors *zeros* and *ones*
+    - Loop over each item in *data*
+        - if the *i*th bit in *item* is a one
+            - add it to the *ones* vector
+        - else the *ith* bit is a zero
+            - add it to the *zeros* vector
+    - if there number of elements in *zeroes* is less than or equal to the number of elements in *ones*
+        - set *data* to *zeros*
+    - else
+        - set *data* to *ones*
+- Return the only element in *data*
 
 ## Things I learned ##
 
