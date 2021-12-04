@@ -9,12 +9,13 @@ class AocDay3 : public AocDay
 {
     private:
         vector<long> read_input(string filename, int & length);
-        //vector<long> create_sliding_windows(vector<long> & measurements);
+        long calculate_oxygen_generator_rating(vector<long> data, int length);
+        long calculate_co2_scrubber_rating(vector<long> data, int length);
     public:
         AocDay3();
         ~AocDay3();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 

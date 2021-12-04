@@ -92,3 +92,86 @@ string AocDay3::part1(string filename, vector<string> extra_args)
     out << gamma * epsilon;
     return out.str();
 }
+
+long AocDay3::calculate_oxygen_generator_rating(vector<long> data, int length)
+{
+    long masks[MAX_LENGTH];
+    for (int i=0; i<length; i++)
+    {
+        masks[i]=1 << (length-1-i);
+    }
+    
+    for (int i=0; i<length, data.size()>1; i++)
+    {
+        vector<long> zeroes, ones;
+        for (int idx=0; idx<data.size(); idx++)
+        {
+            if (data[idx] & masks[i])
+            {
+                ones.push_back(data[idx]);
+            }
+            else
+            {
+                zeroes.push_back(data[idx]);
+            }
+        }
+        if (ones.size() >= zeroes.size())
+        {
+            data = ones;
+        }
+        else
+        {
+            data = zeroes;
+        }
+    }
+    return data[0];
+}
+
+long AocDay3::calculate_co2_scrubber_rating(vector<long> data, int length)
+{
+    long masks[MAX_LENGTH];
+    for (int i=0; i<length; i++)
+    {
+        masks[i]=1 << (length-1-i);
+    }
+    
+    for (int i=0; i<length, data.size()>1; i++)
+    {
+        vector<long> zeroes, ones;
+        for (int idx=0; idx<data.size(); idx++)
+        {
+            if (data[idx] & masks[i])
+            {
+                ones.push_back(data[idx]);
+            }
+            else
+            {
+                zeroes.push_back(data[idx]);
+            }
+        }
+        if (zeroes.size() <= ones.size())
+        {
+            data = zeroes;
+        }
+        else
+        {
+            data = ones;
+        }
+    }
+    return data[0];
+}
+
+string AocDay3::part2(string filename, vector<string> extra_args)
+{
+    int length;
+    vector<long> data = read_input(filename, length);
+    
+    long oxygen = calculate_oxygen_generator_rating(data, length);
+    long carbon = calculate_co2_scrubber_rating(data, length);
+    
+    cout << " Oxygen " << oxygen << " * carbon " << carbon << " = " << oxygen * carbon << endl;
+    
+    ostringstream out;
+    out << oxygen * carbon;
+    return out.str();
+}
