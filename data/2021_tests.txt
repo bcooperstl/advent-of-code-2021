@@ -11,3 +11,4 @@
 3,1,day3_input.txt,2724524
 3,2,test_cases/day3_test1.txt,230
 3,2,day3_input.txt,2775870
+4,1,test_cases/day4_test.1.txt,4512
