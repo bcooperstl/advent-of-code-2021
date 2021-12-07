@@ -145,7 +145,7 @@ void AocDay4::parse_input(string filename, vector<int> & drawn_numbers, vector<C
     for (int card_start=2; card_start < lines.size(); card_start += 6)
     {
         Card card(vector<vector<long>>(lines.begin()+card_start, lines.begin()+card_start+5));
-        card.display();
+        //card.display();
         cards.push_back(card);
     }
     
@@ -159,7 +159,23 @@ string AocDay4::part1(string filename, vector<string> extra_args)
     
     parse_input(filename, drawn_numbers, cards);
     
+    int winning_score = 0;
+    for (int num_idx=0; num_idx < drawn_numbers.size() && !winning_score; num_idx++)
+    {
+        int value = drawn_numbers[num_idx];
+        cout << "processing number " << value << endl;
+        for (int card_idx=0; card_idx < cards.size() && !winning_score; card_idx++)
+        {
+            cards[card_idx].mark_value(value);
+            if (cards[card_idx].has_bingo())
+            {
+                cards[card_idx].display();
+                winning_score = cards[card_idx].calculate_score(value);
+            }
+        }
+    }
+    
     ostringstream out;
-    out << "";;
+    out << winning_score;
     return out.str();
 }
