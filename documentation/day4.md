@@ -77,4 +77,6 @@ I'll create Bingo cards based on lines 2-6, 8-12, etc as needed using the specfi
 
 Had fun developing the algorithm to work with this.
 
+Had to re-lookup how to extract a subset of elements from a vector
+
 
