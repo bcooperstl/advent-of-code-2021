@@ -179,3 +179,34 @@ string AocDay4::part1(string filename, vector<string> extra_args)
     out << winning_score;
     return out.str();
 }
+
+string AocDay4::part2(string filename, vector<string> extra_args)
+{
+    vector<int> drawn_numbers;
+    vector<Card> cards;
+    
+    parse_input(filename, drawn_numbers, cards);
+    
+    int winning_score = 0;
+    for (int num_idx=0; num_idx < drawn_numbers.size(); num_idx++)
+    {
+        int value = drawn_numbers[num_idx];
+        cout << "processing number " << value << endl;
+        for (int card_idx=0; card_idx < cards.size(); card_idx++)
+        {
+            if (!cards[card_idx].has_bingo())
+            {
+                cards[card_idx].mark_value(value);
+                if (cards[card_idx].has_bingo())
+                {
+                    cards[card_idx].display();
+                    winning_score = cards[card_idx].calculate_score(value);
+                }
+            }
+        }
+    }
+    
+    ostringstream out;
+    out << winning_score;
+    return out.str();
+}
