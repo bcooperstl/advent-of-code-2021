@@ -34,7 +34,7 @@ vector<string> FileUtils::split_line_to_strings(string input, char * delimiters,
     }
     
     bool in_quote = false;
-    bool last_matched = false;
+    bool last_matched = true;
     ostringstream current;
     while (*pos != '\0')
     {
