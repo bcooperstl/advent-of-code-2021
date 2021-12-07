@@ -36,6 +36,7 @@ Integer of the power consumption as described in the Part 1 Requirements.
 
 #### Part 2 ####
 
+Integer of the life support rating as described in the Part 2 Requirements.
 
 ## Test Cases ##
 
