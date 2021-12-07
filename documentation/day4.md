@@ -11,6 +11,13 @@ Output the score of the winning card.
 
 ## Part 2 Requirements ##
 
+Given the set of Bingo cards and the list of drawn numbers, find the board that will win last. 
+In this case, Bingos are only horizontal and vertical lines - no diagonals or 4 corners.
+
+When the last winning card is found calculate its score based on the sum of all unmarked numbers by the number that gave the bingo.
+
+Output the score of the winning card.
+
 ### Input Format ###
 
 The first line is a comma-sepaparated-list of drawn numbers for the bingo game.
@@ -27,6 +34,7 @@ Integer of the score of the winning board as described in the Part 1 Requirement
 
 #### Part 2 ####
 
+Integer of the score of the last winning board as described in the Part 2 Requirements.
 
 ## Test Cases ##
 
@@ -39,9 +47,7 @@ There is [one example](../data/test_cases/day4_test1.txt) provided showing sampl
 
 ## Approach ##
 
-### Part 1 ###
-
-#### Data Structures ####
+### Data Structures ###
 
 There will be a "spot" structure used for each value on the bingo card. It will have value and marked properties.
 
@@ -52,7 +58,7 @@ There will be a "card" class used for a Bingo card. It will have:
 - a calculate_score method, taking the last value as an input, which will sum the unmarked spots and then multiply that by the last value to give the score
 - a constuctor taking vector<vector<long>> so I can pass in all 5 rows at once
 
-#### Input Parsing ####
+### Input Parsing ###
 
 I will use my existing read_as_list_of_split_longs method, giving both space and comma as delimiters, so that I can parse everything in one go.
 
@@ -62,7 +68,7 @@ One item being returend will be a vector containing the numbers being called.
 
 I'll create Bingo cards based on lines 2-6, 8-12, etc as needed using the specfific constructor, and return a vector of those as well.
 
-#### Approach ####
+### Part 1 Approach ###
 
 - Parse the input as described in the above section, resuling in a list of and a list of Bingo cards
 - Loop over the numbers to be called
@@ -73,10 +79,21 @@ I'll create Bingo cards based on lines 2-6, 8-12, etc as needed using the specfi
             - Mark that a bingo is found and break out of the loops
 - **Output** the *winning_score* value
 
+### Part 2 Approach ###
+
+- Parse the input as described in the above section, resuling in a list of and a list of Bingo cards
+- Loop over the numbers to be called
+    - Loop over each card that does not have a bingo
+        - Mark the current number in the card.
+        - If this card has a bingo
+            - Calculate the card's score and store in *winning_score*.
+- **Output** the *winning_score* value
+
 ## Things I learned ##
 
 Had fun developing the algorithm to work with this.
 
 Had to re-lookup how to extract a subset of elements from a vector
 
+Very quick to modify from part 1 to part 2
 
