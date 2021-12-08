@@ -10,6 +10,12 @@ Output the number of points that are in those dangerous areas.
 
 ## Part 2 Requirements ##
 
+Take the input list of line segments. These can be horizontal lines, vertical lines, or lines at a 45 degree angles
+
+From this list, determine the dangerous areas, which are points where at least two lines overlap.
+
+Output the number of points that are in those dangerous areas.
+
 ### Input Format ###
 
 List of vents given as line segments in the form:
@@ -24,6 +30,7 @@ Integer of the number of dangerous points - those will 2 or more lines overlappi
 
 #### Part 2 ####
 
+Integer of the number of dangerous points - those will 2 or more lines overlapping.
 
 ## Test Cases ##
 
@@ -60,6 +67,17 @@ This will result in 4 longs per line: x1, y1, x2, y2.
 - Loop over the list of line segments
     - If the line segment is a horizontal or vertical line
         - Call the map_segment method on the map
+- **Output** the result of the count_dangerous method on the map
+
+### Part 2 ###
+
+This is the same as part 1, only it needs to also include line segments that are at 45-degree angles.
+The main code change will be in the map_segment method to handle the 45-degree angles.
+
+- Obtain the list of line segments by parsing the input as described above.
+- Initalize the map to be empty
+- Loop over the list of line segments
+   - Call the map_segment method on the map
 - **Output** the result of the count_dangerous method on the map
 
 ## Things I learned ##
