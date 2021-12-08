@@ -63,32 +63,24 @@ namespace Day5
         int x = segment.x1;
         int y = segment.y1;
         
-        // Vertical line
-        if (segment.x1 == segment.x2)
+        // Since lines will either be horizonal, vertical, or 45-degree angles, this is pretty straightforward
+        
+        if (segment.y2 > segment.y1)
         {
-            if (segment.y2 > segment.y1)
-            {
-                delta_y = 1; // going down, so increment the y each time
-            }
-            else
-            {
-                delta_y = -1; // goign up, so decrement the y each time
-            }
+            delta_y = 1; // going down, so increment the y each time
+        }
+        else if (segment.y2 < segment.y1)
+        {
+            delta_y = -1; // goign up, so decrement the y each time
         }
         
-        // Horizontal line
+        if (segment.x2 > segment.x1)
         {
-            if (segment.y1 == segment.y2)
-            {
-                if (segment.x2 > segment.x1)
-                {
-                    delta_x = 1; // going right, so increment the x each time
-                }
-                else
-                {    
-                    delta_x = -1; // going left, so decrement the x each time
-                }
-            }
+            delta_x = 1; // going right, so increment the x each time
+        }
+        else if (segment.x2 < segment.x1)
+        {    
+            delta_x = -1; // going left, so decrement the x each time
         }
         
         cout << "Segment " << segment.x1 << "," << segment.y1 << " to " 
@@ -185,6 +177,26 @@ string AocDay5::part1(string filename, vector<string> extra_args)
             map.map_segment(vents[i]);
             //map.display();
         }
+    }
+    
+    map.display();
+    
+    ostringstream out;
+    out << map.count_dangerous();
+    return out.str();
+}
+
+string AocDay5::part2(string filename, vector<string> extra_args)
+{
+    vector<LineSegment> vents;
+    
+    parse_input(filename, vents);
+    
+    Map map;
+    
+    for (int i=0; i<vents.size(); i++)
+    {
+        map.map_segment(vents[i]);
     }
     
     map.display();

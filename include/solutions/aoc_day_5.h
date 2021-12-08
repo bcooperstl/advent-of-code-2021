@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#define MAP_SIZE 1000
+#define MAP_SIZE 10
 
 namespace Day5
 {
@@ -41,7 +41,7 @@ class AocDay5 : public AocDay
         AocDay5();
         ~AocDay5();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif
