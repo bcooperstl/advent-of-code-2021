@@ -15,3 +15,5 @@
 4,1,day4_input.txt,10680
 4,2,test_cases/day4_test1.txt,1924
 4,2,day4_input.txt,31892
+5,1,test_cases/day5_test1.txt,5
+
