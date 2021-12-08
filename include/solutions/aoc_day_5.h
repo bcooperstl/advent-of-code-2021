@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#define MAP_SIZE 10
+#define MAP_SIZE 1000
 
 namespace Day5
 {
