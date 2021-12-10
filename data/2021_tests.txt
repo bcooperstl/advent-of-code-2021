@@ -21,4 +21,4 @@
 5,2,day5_input.txt,16518
 # Extra parameter for Day 6 Part 1 is the number of days to run
 6,1,test_cases/day6_test1.txt,26,18
-6,1,test_cases/day6_test1.txt,80,5934
+6,1,test_cases/day6_test1.txt,5934,80
