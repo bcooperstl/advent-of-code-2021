@@ -87,3 +87,7 @@ string AocDay6::part1(string filename, vector<string> extra_args)
     return out.str();
 }
 
+string AocDay6::part2(string filename, vector<string> extra_args)
+{
+    return part1(filename, extra_args);
+}
