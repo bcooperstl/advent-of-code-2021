@@ -10,6 +10,8 @@ Output the number of lanternfish that will be present after the given number of 
 
 ## Part 2 Requirements ##
 
+Same as part 1, but for 256 days instead of 80
+
 ### Input Format ###
 
 Comma-separated list of ages as integers of the lanternfish.
@@ -21,6 +23,8 @@ Comma-separated list of ages as integers of the lanternfish.
 Integer of the number of lanternfish at the given day.
 
 #### Part 2 ####
+
+Integer of the number of lanternfish at the given day.
 
 ## Test Cases ##
 
@@ -47,6 +51,10 @@ There are two examples from [one file](../data/test_cases/day6_test1.txt) provid
     - Increment *counters[6]* by *cloning* for those lanternfish that will be cloning and restarting at 6 days
     - Set *counters[8]* to *cloning* for the lanternfish that were just cloned
 - **Output** the sum of the values in *counters*
+
+### Part 2 ###
+
+Same code as part 1; just uses different input parameter
 
 ## Things I learned ##
 
