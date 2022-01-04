@@ -24,6 +24,7 @@ Integer of the total fuel used to move the crabs to the optimal position.
 
 #### Part 2 ####
 
+Integer of the total fuel used to move the crabs to the optimal position.
 
 ## Test Cases ##
 
