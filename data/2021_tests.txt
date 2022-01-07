@@ -31,3 +31,5 @@
 7,2,day7_input.txt,85015836
 8,1,test_cases/day8_test1.txt,26
 8,1,day8_input.txt,365
+8,2,test_cases/day8_test1.txt,61229
+8,2,test_cases/day8_test1.txt,5353
