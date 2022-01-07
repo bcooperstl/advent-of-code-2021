@@ -359,7 +359,7 @@ namespace Day8
     
     int Display::get_output_value()
     {
-        return 0;
+        return ((m_digits[m_outputs[0]] * 1000) + (m_digits[m_outputs[1]] * 100) + (m_digits[m_outputs[2]] * 10) + (m_digits[m_outputs[3]]));
     }
 };
 
