@@ -34,3 +34,7 @@
 8,2,test_cases/day8_test1.txt,61229
 8,2,test_cases/day8_test2.txt,5353
 8,2,day8_input.txt,975706
+9,1,test_cases/day9_test1.txt,15
+9,1,test_cases/day9_test2.txt,15
+9,1,test_cases/day9_test3.txt,15
+9,1,test_cases/day9_test4.txt,15
