@@ -38,3 +38,8 @@
 9,1,test_cases/day9_test2.txt,15
 9,1,test_cases/day9_test3.txt,15
 9,1,test_cases/day9_test4.txt,15
+9,1,day9_input.txt,448
+9,2,test_cases/day9_test1.txt,1134
+9,2,test_cases/day9_test2.txt,1134
+9,2,test_cases/day9_test3.txt,1134
+9,2,test_cases/day9_test4.txt,1134
