@@ -27,12 +27,13 @@ class AocDay10 : public AocDay
         bool is_closing_chunk_char(char ch);
         bool is_matching_chunk_chars(char open, char close);
         bool check_corrupted(string input, char & invalid_char);
+        bool check_incomplete(string input, long & autocomplete_score);
         
     public:
         AocDay10();
         ~AocDay10();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif
