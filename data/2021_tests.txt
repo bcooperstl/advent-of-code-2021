@@ -47,3 +47,4 @@
 10,1,test_cases/day10_test1.txt,26397
 10,1,day10_input.txt,387363
 10,2,test_cases/day10_test1.txt,288957
+10,2,day10_input.txt,4330777059
