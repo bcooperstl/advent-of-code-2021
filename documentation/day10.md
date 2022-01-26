@@ -148,3 +148,4 @@ This will use an array as a stack to store the opening characters for the chunk
 
 Fun to write the algorithm. Annoyed that > is not simple 1 more than < in ASCII, so I have to do actual comparisons instead of just looking for the closing value being one higher than the opening value.
 
+Realized that I could re-use the stack to calculate the score for part 2 without having to re-determine the acutal closing characters
