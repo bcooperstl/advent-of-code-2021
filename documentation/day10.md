@@ -18,6 +18,20 @@ Output the sum of the scores for all of the corrupted lines in the file.
 
 ## Part 2 Requirements ##
 
+You are given a list of strings as described in the input format. Each string has one or more chunks, with other chunks able to be nested in the middle.
+
+Discard the corrupted strings and focus on the incomplete strings. Find the sequence of closing characters needed to complete the strings.
+
+Compute the autocomplete score for each string by the following algorithm
+- Start with 0.
+- For each auto-complete character:
+    - multiply by 5
+    - add 1 for ')', 2 for '\]', 3 for '}' or 4 for '>'
+
+Sort the autocomplete scores.
+
+Output the middle auto-complete score (there will be an odd number)
+
 ### Input Format ###
 
 A list of strings, one per line, consisting of combinations of the following open/close pairs of symbols:
@@ -35,6 +49,7 @@ A number corresponding to the sum of the scores as described in the requirements
 
 #### Part 2 ####
 
+A number corresponding to the middle value of the autocomplete-scores as described in the requirements.
 
 ## Test Cases ##
 
@@ -89,6 +104,45 @@ This will use an array as a stack to store the opening characters for the chunk
     - If `is_corrupted` is true
         - Use a lookup map to increment `sum_score` based on the `invalid_char` value
 - **Output** the *sum_score* value
+
+### Part 2 ###
+
+#### Check Incomplete function ####
+
+This function will take a string, and check if it is incomplete. It will return true if corrupted, or false if not-corrupted.
+
+Additionally, it will return back the autocomplete score for the what is needed to complete it.
+
+This will use an array as a stack to store the opening characters for the chunk
+
+- Initialze a `stack_pos` to point to -1 to show there aren't any elements in the `stack` array.
+- Loop over the input string with i
+    - If `input[i]` is an opening character
+        - Increment `stack_pos` and set `stack[stack_pos]` to `input[i]`
+    - If `input[i]` is an closing character
+        - If `stack_pos` is set to -1, there aren't any elements on the stack.
+            - return false
+        - Else, there are elements on the stack
+            - If `input[i]` is the closing char that matches `stack[stack_pos]` this is a valid match
+                - Decrement `stack_pos`
+            - Else, there makes a corrupted input
+                - return false
+- At this point, we have the stack containing all of the opening characters that need to be closed.
+- Initialize `score` to 0
+- Loop over the stack backwards from `stack_pos` to `0` with `i`
+    - multiply `score` by 5
+    - based on `stack[i]`, add 1 for '(', 2 for '\[', 3 for '{' or 4 for '<' 
+- Return true
+
+#### Main Processing ####
+
+- Parse the input file as a list of strings as `lines`.
+- For each `line` in `lines`
+    - Call the check_incomplete function, storing the result in `is_incomplete` and `score`
+    - If `is_incomplete` is true
+        - add `score` to the `scores` vector
+- Sort the `scores` vector
+- **Output** the middle value of the *scores* vector (`scores[scores.size()/2]`)
 
 ## Things I learned ##
 
