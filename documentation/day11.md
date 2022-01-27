@@ -19,6 +19,8 @@ Output the total number of flashes across the 100 steps.
 
 ## Part 2 Requirements ##
 
+Extending on from part 1, we need to find the first step in which all 100 of the octopuses flash.
+
 ### Input Format ###
 
 The input is 10 rows by 10 columns of single-digit integers (values 0-9). There is no separation between integers within a row.
@@ -31,6 +33,7 @@ A number corresponding to the total number of flashes throughout the 100 steps.
 
 #### Part 2 ####
 
+A number corresponding to the first day in which all 100 octopuses flash.
 
 ## Test Cases ##
 
@@ -85,6 +88,16 @@ This simple method will call run_step repeatedly for the number of steps. It wil
 - Parse the input into an array of strings
 - Construct a grid based on the input
 - **Output** the result of the grid's run_steps method called with 100 steps.
+
+### Part 2 main loop ###
+
+- Parse the input into an array of strings
+- Construct a grid based on the input
+- Initialize a step_counter to 1
+- while the grid's run_step method does not return 100
+    - increment step_counter
+- **Output** the step_counter value, which is the number of steps needed for all octopuses to flash.
+
 
 ## Things I learned ##
 
