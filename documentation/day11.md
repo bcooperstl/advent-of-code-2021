@@ -55,19 +55,25 @@ I will create a grid class to store the octopuses. It will have:
 ### run_step method ###
 
 - Declare a *flash_queue[100][2]* to contain the items that will flash.
+- Declare a *in_flash_queue[10][10]* bool array to contain whether items are in the flash queue
 - Set *insert_pos* to 0
 - Loop over each cell in *energy* with *row* and *col*
     - Increment *energy[row][col]* by 1.
     - If the new energy is > 9
         - Set *flash_queue[insert_pos]* to be *row* and *col*
         - Increment *insert_pos*
+        - Set *in_flash_queue[row][col]* to true
 - Declare *work_pos* to 0
 - While *work_pos* < *insert_pos* 
     - Increment by 1 the energy values for all (up to 8) neighbors of *flash_queue[work_pos]*
-    - If the value of those neighbors > 9 and they are not already in *flash_queue*
+    - If the value of those neighbors > 9 and they are not already true in *in_flash_queue*
         - Set *flash_queue[insert_pos]* to be the neighbor's *row* and *col*
         - Increment *insert_pos*
+        - Set *in_flash_queue[row][col]* to true
         - By incrementing insert_pos, the while loop will process this new item at the end.
+    - Increment *work_pos*
+- Loop over each cell in *energy* with *row* and *col*
+    - If the energy is > 9, reset it to 0
 - Return *insert_pos*, which equals the number of items that flashed.
 
 ### run_steps method ###
