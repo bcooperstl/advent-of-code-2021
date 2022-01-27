@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Day11;
 
+#define PART_1_STEPS 100
+
 namespace Day11
 {
     Grid::Grid(vector<string> energy)
@@ -55,6 +57,7 @@ namespace Day11
                 m_energy[row][col]++;
                 if (m_energy[row][col] > FLASH_THRESHOLD)
                 {
+                    //cout << "queueing at " << row << "," << col << endl;
                     flash_queue[insert_pos][ROW] = row;
                     flash_queue[insert_pos][COL] = col;
                     insert_pos++;
@@ -66,6 +69,7 @@ namespace Day11
         {
             int row=flash_queue[work_pos][ROW];
             int col=flash_queue[work_pos][COL];
+            //cout << "processing neighbors of " << row << "," << col << endl;
             // above row
             if (row > 0)
             {
@@ -73,6 +77,7 @@ namespace Day11
                 m_energy[row-1][col]++;
                 if (m_energy[row-1][col] > FLASH_THRESHOLD && (!in_flash_queue[row-1][col]))
                 {
+                    
                     flash_queue[insert_pos][ROW] = row-1;
                     flash_queue[insert_pos][COL] = col;
                     insert_pos++;
@@ -82,6 +87,7 @@ namespace Day11
                 // left
                 if (col > 0)
                 {
+                    m_energy[row-1][col-1]++;
                     if (m_energy[row-1][col-1] > FLASH_THRESHOLD && (!in_flash_queue[row-1][col-1]))
                     {
                         flash_queue[insert_pos][ROW] = row-1;
@@ -94,6 +100,7 @@ namespace Day11
                 // right
                 if (col < (SIDE_LENGTH - 1))
                 {
+                    m_energy[row-1][col+1]++;
                     if (m_energy[row-1][col+1] > FLASH_THRESHOLD && (!in_flash_queue[row-1][col+1]))
                     {
                         flash_queue[insert_pos][ROW] = row-1;
@@ -120,6 +127,7 @@ namespace Day11
                 // left
                 if (col > 0)
                 {
+                    m_energy[row+1][col-1]++;
                     if (m_energy[row+1][col-1] > FLASH_THRESHOLD && (!in_flash_queue[row+1][col-1]))
                     {
                         flash_queue[insert_pos][ROW] = row+1;
@@ -132,6 +140,7 @@ namespace Day11
                 // right
                 if (col < (SIDE_LENGTH - 1))
                 {
+                    m_energy[row+1][col+1]++;
                     if (m_energy[row+1][col+1] > FLASH_THRESHOLD && (!in_flash_queue[row+1][col+1]))
                     {
                         flash_queue[insert_pos][ROW] = row+1;
@@ -146,6 +155,7 @@ namespace Day11
             // left
             if (col > 0)
             {
+                m_energy[row][col-1]++;
                 if (m_energy[row][col-1] > FLASH_THRESHOLD && (!in_flash_queue[row][col-1]))
                 {
                     flash_queue[insert_pos][ROW] = row;
@@ -158,6 +168,7 @@ namespace Day11
             // right
             if (col < (SIDE_LENGTH - 1))
             {
+                m_energy[row][col+1]++;
                 if (m_energy[row][col+1] > FLASH_THRESHOLD && (!in_flash_queue[row][col+1]))
                 {
                     flash_queue[insert_pos][ROW] = row;
@@ -226,7 +237,7 @@ string AocDay11::part1(string filename, vector<string> extra_args)
     Grid grid(input);
     grid.dump();
     
-    long total_steps = grid.run_steps(100);
+    long total_steps = grid.run_steps(PART_1_STEPS);
     
     ostringstream out;
     out << total_steps;
