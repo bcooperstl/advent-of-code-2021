@@ -237,9 +237,26 @@ string AocDay11::part1(string filename, vector<string> extra_args)
     Grid grid(input);
     grid.dump();
     
-    long total_steps = grid.run_steps(PART_1_STEPS);
+    long total_flashes = grid.run_steps(PART_1_STEPS);
     
     ostringstream out;
-    out << total_steps;
+    out << total_flashes;
+    return out.str();
+}
+
+string AocDay11::part2(string filename, vector<string> extra_args)
+{
+    vector<string> input = read_input(filename);
+    Grid grid(input);
+    grid.dump();
+    
+    long num_steps = 1;
+    while (grid.run_step() != 100)
+    {
+        num_steps++;
+    }
+    
+    ostringstream out;
+    out << num_steps;
     return out.str();
 }
