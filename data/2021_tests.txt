@@ -50,3 +50,4 @@
 10,2,day10_input.txt,4330777059
 11,1,test_cases/day11_test1.txt,1656
 11,1,day11_input.txt,1721
+11,2,test_cases/day11_test1.txt,195
