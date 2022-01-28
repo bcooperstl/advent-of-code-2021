@@ -251,14 +251,14 @@ vector<vector<string>> AocDay12::read_input(string filename)
 
 void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths, bool with_one_small_repeat)
 {
-    cout << "Find_paths for ";
-    current_path.dump();
+    //cout << "Find_pathms for ";
+    //current_path.dump();
     
     if (current_path.is_complete())
     {
         completed_paths.push_back(current_path);
-        cout << " Adding completed path ";
-        current_path.dump();
+        //cout << " Adding completed path ";
+        //current_path.dump();
         return;
     }
     Cave * current_cave = current_path.get_current_cave();
