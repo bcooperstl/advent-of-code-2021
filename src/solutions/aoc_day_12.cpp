@@ -99,15 +99,15 @@ namespace Day12
         return true;
     }
     
-    LittleCave::LittleCave(string name):Cave(name)
+    SmallCave::SmallCave(string name):Cave(name)
     {
     }
     
-    LittleCave::~LittleCave()
+    SmallCave::~SmallCave()
     {
     }
     
-    bool LittleCave::is_little()
+    bool SmallCave::is_small()
     {
         return true;
     }
@@ -123,8 +123,10 @@ namespace Day12
     
     bool Path::can_visit(Cave * next)
     {
+        cout << "next is " << next << " " << next->get_name() << endl;
         if (next->is_small()) // can only visit small caves if they haven't been visited
         {
+            cout << " is_small" << endl;
             for (int i=0; i<m_next_path; i++)
             {
                 if (m_path[i] == next)
@@ -198,6 +200,9 @@ vector<vector<string>> AocDay12::read_input(string filename)
 
 void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths)
 {
+    cout << "Find_paths for ";
+    current_path.dump();
+    
     if (current_path.is_complete())
     {
         completed_paths.push_back(current_path);
@@ -236,7 +241,7 @@ Cave * AocDay12::create_cave(string name)
         return new BigCave(name);
     }
     
-    return new LittleCave(name);
+    return new SmallCave(name);
 }
 
 string AocDay12::part1(string filename, vector<string> extra_args)
@@ -248,6 +253,7 @@ string AocDay12::part1(string filename, vector<string> extra_args)
     
     for (int i=0; i<input.size(); i++)
     {
+        cout << "Processing " << input[i][0] << "-" << input[i][1] << endl;
         Cave * left;
         Cave * right;
         map<string, Cave *>::iterator it = lookups.find(input[i][0]);
@@ -265,8 +271,8 @@ string AocDay12::part1(string filename, vector<string> extra_args)
         it = lookups.find(input[i][1]);
         if (it == lookups.end()) // not in map
         {
-            right = create_cave(input[i][0]);
-            lookups[input[i][0]]=right;
+            right = create_cave(input[i][1]);
+            lookups[input[i][1]]=right;
             caves.push_back(right);
         }
         else
@@ -294,7 +300,7 @@ string AocDay12::part1(string filename, vector<string> extra_args)
             left->add_neighbor(right);
             cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
         }
-        else // both are some combination of big and little
+        else // both are some combination of big and small
         {
             left->add_neighbor(right);
             right->add_neighbor(left);

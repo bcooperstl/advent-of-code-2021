@@ -51,12 +51,12 @@ namespace Day12
             bool is_big();
     };
     
-    class LittleCave : public Cave
+    class SmallCave : public Cave
     {
         public:
-            LittleCave(string name);
-            ~LittleCave();
-            bool is_little();
+            SmallCave(string name);
+            ~SmallCave();
+            bool is_small();
     };
     
     class Path
