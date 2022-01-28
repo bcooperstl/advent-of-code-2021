@@ -68,7 +68,7 @@ A path will have:
 - a can_visit_cave method which takes a cave and returns true if the path allows that cave to be visited next or false if not.
 - visit method, which takes the next cave to visit.
 - is_complete method, which will return true on a complete path (going from start-to-end) or false if not
-- a get_current_cave method, which passes in the current (last) cave in the array of caves
+- a get_current_cave method, which returns the current (last) cave in the array of caves
 
 The main processing will contain a map<string, Cave \*> to map from the cave's name to the object
 
