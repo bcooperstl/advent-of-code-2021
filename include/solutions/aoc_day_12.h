@@ -82,6 +82,7 @@ class AocDay12 : public AocDay
     private:
         vector<vector<string>> read_input(string filename);
         void find_paths(Path & current_path, vector<Path> & completed_paths);
+        Cave * create_cave(string name);
     public:
         AocDay12();
         ~AocDay12();

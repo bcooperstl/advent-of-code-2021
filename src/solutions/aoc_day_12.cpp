@@ -3,10 +3,13 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
-#include <algorithm>
+#include <cctype>
 
 #include "aoc_day_12.h"
 #include "file_utils.h"
+
+#define NAME_START "start"
+#define NAME_END "end"
 
 using namespace std;
 using namespace Day12;
@@ -193,13 +196,127 @@ vector<vector<string>> AocDay12::read_input(string filename)
     return data;
 }
 
+void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths)
+{
+    if (current_path.is_complete())
+    {
+        completed_paths.push_back(current_path);
+        cout << "Adding completed path " << endl;
+        current_path.dump();
+        return;
+    }
+    Cave * current_cave = current_path.get_current_cave();
+    vector<Cave *> neighbors = current_cave->get_neighbors();
+    for (int i=0; i<neighbors.size(); i++)
+    {
+        if (current_path.can_visit(neighbors[i]))
+        {
+            Path next_path(current_path);
+            next_path.visit(neighbors[i]);
+            find_paths(next_path, completed_paths);
+        }
+    }
+    return;
+}
+
+Cave * AocDay12::create_cave(string name)
+{
+    if (name == NAME_START)
+    {
+        return new StartCave(name);
+    }
+    
+    if (name == NAME_END)
+    {
+        return new EndCave(name);
+    }
+    
+    if (isupper(name[0]))
+    {
+        return new BigCave(name);
+    }
+    
+    return new LittleCave(name);
+}
 
 string AocDay12::part1(string filename, vector<string> extra_args)
 {
     vector<vector<string>> input = read_input(filename);
     
+    map<string, Cave *> lookups;
+    vector<Cave *> caves;
+    
+    for (int i=0; i<input.size(); i++)
+    {
+        Cave * left;
+        Cave * right;
+        map<string, Cave *>::iterator it = lookups.find(input[i][0]);
+        if (it == lookups.end()) // not in map
+        {
+            left = create_cave(input[i][0]);
+            lookups[input[i][0]]=left;
+            caves.push_back(left);
+        }
+        else
+        {
+            left = it->second;
+        }
+        
+        it = lookups.find(input[i][1]);
+        if (it == lookups.end()) // not in map
+        {
+            right = create_cave(input[i][0]);
+            lookups[input[i][0]]=right;
+            caves.push_back(right);
+        }
+        else
+        {
+            right = it->second;
+        }
+        
+        if (left->is_start())
+        {
+            left->add_neighbor(right);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+        }
+        else if (right->is_start())
+        {
+            right->add_neighbor(left);
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+        else if (left->is_end())
+        {
+            right->add_neighbor(left);
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+        else if (right->is_end())
+        {
+            left->add_neighbor(right);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+        }
+        else // both are some combination of big and little
+        {
+            left->add_neighbor(right);
+            right->add_neighbor(left);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+    }
+    
+    vector<Path> completed_paths;
+    Path start_path;
+    start_path.visit(lookups[NAME_START]);
+    
+    find_paths(start_path, completed_paths);
+        
     ostringstream out;
-    out << "";
+    out << completed_paths.size();
+    
+    for (int i=0; i<caves.size(); i++)
+    {
+        delete caves[i];
+    }
+    
     return out.str();
 }
 
