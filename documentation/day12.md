@@ -13,6 +13,8 @@ After you find all of the distinct paths, output that value.
 
 ## Part 2 Requirements ##
 
+Part 2 is the same as part 1, except one small cave (not start or end) may be visited twice, instead of just once.
+
 ### Input Format ###
 
 A series of lines showing the connections between caves.
@@ -26,6 +28,7 @@ A number which is the count of distinct paths from start to end.
 
 #### Part 2 ####
 
+A number which is the count of distinct paths from start to end.
 
 ## Test Cases ##
 
@@ -107,6 +110,13 @@ The two parameters are *current_path* and *completed_paths*
 - Delete all of the Cave objects in *caves*
 - **Output** the size of the *paths* array
 
+#### Part 2 changes ####
+
+I will simply add a boolean with_one_small_repeat indicator value to the path's can_visit_cave function. If this is false, it behaves as part 1.
+If this is true, it allows one small cave to be repeated once in the path.
+
+The find_caves recusrive method will also have to have this boolean added.
+
 ## Things I learned ##
 
 Had a lot of fun thinking through the data structes and algorithms for this.
@@ -114,3 +124,5 @@ Had a lot of fun thinking through the data structes and algorithms for this.
 Enjoyed using polymorphism again.
 
 Used recursion again.
+
+Very happy that the design for part 1 is simple to extend for part 2.
