@@ -121,19 +121,72 @@ namespace Day12
     {
     }
     
-    bool Path::can_visit(Cave * next)
+    bool Path::can_visit(Cave * next, bool with_one_small_repeat)
     {
-        if (next->is_small()) // can only visit small caves if they haven't been visited
+        if (!with_one_small_repeat)
         {
-            for (int i=0; i<m_next_path; i++)
+            if (next->is_small()) // can only visit small caves if they haven't been visited
             {
-                if (m_path[i] == next)
+                for (int i=0; i<m_next_path; i++)
                 {
-                    return false;
+                    if (m_path[i] == next)
+                    {
+                        return false;
+                    }
                 }
             }
+            return true; // no other restrictions
         }
-        return true; // no other restrictions
+        else
+        {
+            if (next->is_small()) // assuming path is already valid, so if the new one is not a small, we are good
+            {
+                Cave * small_caves[32];
+                int small_cave_counter[32];
+                int small_cave_pos = 0;
+                bool already_has_two = false;
+                for (int i=0; i<m_next_path; i++)
+                {
+                    if (m_path[i]->is_small())
+                    {
+                        bool small_found = false;
+                        
+                        for (int j=0; j<small_cave_pos; j++)
+                        {
+                            if (small_caves[j] == m_path[i])
+                            {
+                                small_cave_counter[j]++;
+                                small_found = true;
+                                already_has_two = true;
+                            }
+                        }
+                        if (!small_found)
+                        {
+                            small_caves[small_cave_pos] = m_path[i];
+                            small_cave_counter[small_cave_pos] = 1;
+                            small_cave_pos++;
+                        }
+                    }
+                }
+                if (!already_has_two) // short circuit - if none have two, we are good
+                {
+                    return true;
+                }
+                // at this point, one item is already in there twice. 
+                // We need to make sure that the new small cave has not yet been visited, 
+                // or else it would now be a second one visited twice
+                for (int i=0; i<small_cave_pos; i++)
+                {
+                    if (small_caves[i] == next)
+                    {
+                        return false;
+                    }
+                }
+                // not a match, good to add.
+                return true;
+            }
+        }
+        return true;
     }
     
     void Path::visit(Cave * next)
@@ -196,7 +249,7 @@ vector<vector<string>> AocDay12::read_input(string filename)
     return data;
 }
 
-void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths)
+void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths, bool with_one_small_repeat)
 {
     cout << "Find_paths for ";
     current_path.dump();
@@ -212,11 +265,11 @@ void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths)
     vector<Cave *> neighbors = current_cave->get_neighbors();
     for (int i=0; i<neighbors.size(); i++)
     {
-        if (current_path.can_visit(neighbors[i]))
+        if (current_path.can_visit(neighbors[i], with_one_small_repeat))
         {
             Path next_path(current_path);
             next_path.visit(neighbors[i]);
-            find_paths(next_path, completed_paths);
+            find_paths(next_path, completed_paths, with_one_small_repeat);
         }
     }
     return;
@@ -311,7 +364,7 @@ string AocDay12::part1(string filename, vector<string> extra_args)
     Path start_path;
     start_path.visit(lookups[NAME_START]);
     
-    find_paths(start_path, completed_paths);
+    find_paths(start_path, completed_paths, false);
         
     ostringstream out;
     out << completed_paths.size();
@@ -324,3 +377,84 @@ string AocDay12::part1(string filename, vector<string> extra_args)
     return out.str();
 }
 
+string AocDay12::part2(string filename, vector<string> extra_args)
+{
+    vector<vector<string>> input = read_input(filename);
+    
+    map<string, Cave *> lookups;
+    vector<Cave *> caves;
+    
+    for (int i=0; i<input.size(); i++)
+    {
+        cout << "Processing " << input[i][0] << "-" << input[i][1] << endl;
+        Cave * left;
+        Cave * right;
+        map<string, Cave *>::iterator it = lookups.find(input[i][0]);
+        if (it == lookups.end()) // not in map
+        {
+            left = create_cave(input[i][0]);
+            lookups[input[i][0]]=left;
+            caves.push_back(left);
+        }
+        else
+        {
+            left = it->second;
+        }
+        
+        it = lookups.find(input[i][1]);
+        if (it == lookups.end()) // not in map
+        {
+            right = create_cave(input[i][1]);
+            lookups[input[i][1]]=right;
+            caves.push_back(right);
+        }
+        else
+        {
+            right = it->second;
+        }
+        
+        if (left->is_start())
+        {
+            left->add_neighbor(right);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+        }
+        else if (right->is_start())
+        {
+            right->add_neighbor(left);
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+        else if (left->is_end())
+        {
+            right->add_neighbor(left);
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+        else if (right->is_end())
+        {
+            left->add_neighbor(right);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+        }
+        else // both are some combination of big and small
+        {
+            left->add_neighbor(right);
+            right->add_neighbor(left);
+            cout << "Mapping " << left->get_name() << " --> " << right->get_name() << endl;
+            cout << "Mapping " << right->get_name() << " --> " << left->get_name() << endl;
+        }
+    }
+    
+    vector<Path> completed_paths;
+    Path start_path;
+    start_path.visit(lookups[NAME_START]);
+    
+    find_paths(start_path, completed_paths, true);
+        
+    ostringstream out;
+    out << completed_paths.size();
+    
+    for (int i=0; i<caves.size(); i++)
+    {
+        delete caves[i];
+    }
+    
+    return out.str();
+}

@@ -67,7 +67,7 @@ namespace Day12
         public:
             Path();
             ~Path();
-            bool can_visit(Cave * next);
+            bool can_visit(Cave * next, bool with_one_small_repeat);
             void visit(Cave * next);
             bool is_complete();
             Cave * get_current_cave();
@@ -81,13 +81,13 @@ class AocDay12 : public AocDay
 {
     private:
         vector<vector<string>> read_input(string filename);
-        void find_paths(Path & current_path, vector<Path> & completed_paths);
+        void find_paths(Path & current_path, vector<Path> & completed_paths, bool with_one_small_repeat);
         Cave * create_cave(string name);
     public:
         AocDay12();
         ~AocDay12();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif
