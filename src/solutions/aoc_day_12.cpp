@@ -123,10 +123,8 @@ namespace Day12
     
     bool Path::can_visit(Cave * next)
     {
-        cout << "next is " << next << " " << next->get_name() << endl;
         if (next->is_small()) // can only visit small caves if they haven't been visited
         {
-            cout << " is_small" << endl;
             for (int i=0; i<m_next_path; i++)
             {
                 if (m_path[i] == next)
@@ -206,7 +204,7 @@ void AocDay12::find_paths(Path & current_path, vector<Path> & completed_paths)
     if (current_path.is_complete())
     {
         completed_paths.push_back(current_path);
-        cout << "Adding completed path " << endl;
+        cout << " Adding completed path ";
         current_path.dump();
         return;
     }
