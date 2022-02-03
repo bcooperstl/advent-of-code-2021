@@ -12,6 +12,10 @@ Only do the first fold in the instructions, and output the number of dots that a
 
 ## Part 2 Requirements ##
 
+Continue folding all of the folds.
+
+The solution is determined by reading the final display, which is 8 capital letters.
+
 ### Input Format ###
 
 The input is broken up into two sections.
@@ -28,6 +32,7 @@ A number corresponding to the number of dots shown after the first fold.
 
 #### Part 2 ####
 
+Text of 8 capital letters from reading the output. Must be read by a human.
 
 ## Test Cases ##
 
@@ -73,13 +78,20 @@ For a horizontal (x=*n*) fold:
     - Any points with a x-component less than *n* will stay the same.
     - Any points with a x-component greater than *n* will keep their y component, and set the new x to n-(x-n) to refelct them.
 
-### Main Loop ###
+### Part 1 Main Loop ###
 
 - Parse the input into a set<dot> *dots* and vector<fold_instructions> *folds*
 - Display the sheet of paper with *dots*
 - Perform the first fold (*folds[0]*) on *dots*, storing the result in *dots*
 - Display the sheet of paper with *dots*
 - **Output** the size of *dots*. This is the number of visible dots, since *dots* is a set and therefore duplicate free
+
+### Part 2 Main Loop ###
+
+- Parse the input into a set<dot> *dots* and vector<fold_instructions> *folds*
+- Loop over all of the *folds* and perform them, storing the result in *dots* each time
+- Display the sheet of paper with *dots*
+- **Output** a zero; you have to read the displayed output to understand the real result
 
 ## Things I learned ##
 
