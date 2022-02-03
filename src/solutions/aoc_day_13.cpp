@@ -174,3 +174,25 @@ string AocDay13::part1(string filename, vector<string> extra_args)
     out << result;
     return out.str();
 }
+
+string AocDay13::part2(string filename, vector<string> extra_args)
+{
+    set<Dot> dots;
+    vector<FoldInstruction> folds;
+    
+    parse_input(filename, dots, folds);
+    cout << "There are " << dots.size() << " dots and " << folds.size() << " folds" << endl;
+    
+    for (int i=0; i<folds.size(); i++)
+    {
+        dots = perform_fold(dots, folds[i]);
+        cout << "Performing fold " << folds[i].direction << "=" << folds[i].position << " resulted in " << dots.size() << " dots remaining" << endl;
+    }
+    
+    cout << "FIND THE 8 CAPITAL LETTERS IN THIS OUTPUT FOR THE PUZZLE RESULT!!!" << endl << endl;
+    display_sheet(dots);
+    
+    ostringstream out;
+    out << 0;
+    return out.str();
+}
