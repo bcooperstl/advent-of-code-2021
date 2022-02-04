@@ -65,3 +65,4 @@
 14,1,test_cases/day14_test1.txt,1588
 14,1,day14_input.txt,2549
 14,2,test_cases/day14_test1.txt,2188189693529
+14,2,day14_input.txt,2516901104210
