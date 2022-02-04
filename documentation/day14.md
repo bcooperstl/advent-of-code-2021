@@ -13,6 +13,8 @@ Subtract the lowest quantity from the highest quantity, and output that result.
 
 ## Part 2 Requirements ##
 
+Same as part 1, but run the insertion 40 times instead of 10 times.
+
 ### Input Format ###
 
 The first line of the linput is the polymer template. It is a string.
@@ -85,6 +87,13 @@ A *rule* structure will be defined to contain:
 - Divide all *quantities* by 2
 - Find the largest and smallest values in *quantities*
 - **Output** largest - smallest
+
+### Part 2 Changes ###
+
+Part 2 is the same as part 1, except it needs to run 40 times.
+
+Change ints to longs to prevent overflow. Same code otherwise.
+
 
 ## Things I learned ##
 
