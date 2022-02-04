@@ -63,3 +63,4 @@
 13,1,test_cases/day13_test1.txt,17
 13,1,day13_input.txt,638
 14,1,test_cases/day14_test1.txt,1588
+14,1,day14_input.txt,2549
