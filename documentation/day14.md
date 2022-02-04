@@ -80,6 +80,9 @@ A *rule* structure will be defined to contain:
             - Increment its count by *pair.quantity*
         - Else
             - Insert it into *quantities* with *pair.quantity*
+- At this point, quantities is double-counted, except for the first and last characters in the original string
+- Increment the *quantities* for the first and last chars in *initial_polymer_str* by 1
+- Divide all *quantities* by 2
 - Find the largest and smallest values in *quantities*
 - **Output** largest - smallest
 
