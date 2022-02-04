@@ -61,12 +61,13 @@ A *rule* structure will be defined to contain:
 
 ### Part 1 Main Loop ###
 
-- Parse the input into *initial_polymer_str* and *rules*
+- Parse the input into *initial_polymer_str* and *rule_map*
 - Construct the *current* map from the *initial_polymer_str* string
 - Loop 10 times
     - Create a *next* polymer map
     - Loop over each pair in *current* with *pair*
-        - For both *pair.output* items
+        - Find the *rule* that corresponds with the key of *pair*
+        - For both *rule.output* items
             - If *next* contains the item
                 - Increment its count by *pair.quantity*
             - Else
