@@ -21,11 +21,12 @@ class AocDay14 : public AocDay
 {
     private:
         void parse_input(string filename, string & polymer, map<string, Rule> & rules);
+        long perform_processing(string initial_polymer, map<string, Rule> & rule_map, int num_loops);
     public:
         AocDay14();
         ~AocDay14();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif

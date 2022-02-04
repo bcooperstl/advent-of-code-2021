@@ -48,31 +48,26 @@ void AocDay14::parse_input(string filename, string & polymer, map<string, Rule> 
     return;
 }
 
-string AocDay14::part1(string filename, vector<string> extra_args)
+long AocDay14::perform_processing(string initial_polymer, map<string, Rule> & rules, int num_loops)
 {
-    string initial_polymer;
-    map<string, Rule> rules;
-    
-    parse_input(filename, initial_polymer, rules);
-    
-    map<string, int> current;
+    map<string, long> current;
     for (int i=0; i<initial_polymer.size() - 1; i++)
     {
         string pair = initial_polymer.substr(i, 2); // get 2 characters starting at i
         if (current.find(pair) != current.end())
         {
-            current[pair] = current[pair] + 1;
+            current[pair] = current[pair] + 1L; // 1 as a long
         }
         else
         {
-            current[pair] = 1;
+            current[pair] = 1L; // 1 as a long
         }
     }
     
-    for (int i=0; i<10; i++)
+    for (int i=0; i<num_loops; i++)
     {
-        map<string, int> next;
-        for (map<string, int>::iterator pos = current.begin(); pos != current.end(); ++pos)
+        map<string, long> next;
+        for (map<string, long>::iterator pos = current.begin(); pos != current.end(); ++pos)
         {
             Rule rule = rules[pos->first];
             for (int i=0; i<2; i++)
@@ -90,8 +85,8 @@ string AocDay14::part1(string filename, vector<string> extra_args)
         current = next;
     }
     
-    map<char, int> quantities;
-    for (map<string, int>::iterator pos = current.begin(); pos != current.end(); ++pos)
+    map<char, long> quantities;
+    for (map<string, long>::iterator pos = current.begin(); pos != current.end(); ++pos)
     {
         string pair = pos->first;
         for (int i=0; i<2; i++)
@@ -108,18 +103,18 @@ string AocDay14::part1(string filename, vector<string> extra_args)
         }
     }
     
-    quantities[initial_polymer[0]] = quantities[initial_polymer[0]] + 1;
-    quantities[initial_polymer[initial_polymer.size()-1]] = quantities[initial_polymer[initial_polymer.size()-1]] + 1;
+    quantities[initial_polymer[0]] = quantities[initial_polymer[0]] + 1L; // 1 as a long
+    quantities[initial_polymer[initial_polymer.size()-1]] = quantities[initial_polymer[initial_polymer.size()-1]] + 1L; // 1 as a long
     
-    for (map<char, int>::iterator pos = quantities.begin(); pos != quantities.end(); ++pos)
+    for (map<char, long>::iterator pos = quantities.begin(); pos != quantities.end(); ++pos)
     {
-        quantities[pos->first] = pos->second/2;
+        quantities[pos->first] = pos->second/2L; // 2 as a long
     }
     
-    int largest = quantities.begin()->second;
-    int smallest = quantities.begin()->second;
+    long largest = quantities.begin()->second;
+    long smallest = quantities.begin()->second;
 
-    for (map<char, int>::iterator pos = quantities.begin(); pos != quantities.end(); ++pos)
+    for (map<char, long>::iterator pos = quantities.begin(); pos != quantities.end(); ++pos)
     {
         cout << "Character " << pos->first << " appears " << pos->second << " times." << endl;
         if (pos->second > largest)
@@ -131,9 +126,31 @@ string AocDay14::part1(string filename, vector<string> extra_args)
             smallest = pos->second;
         }
     }
+    return largest - smallest;
+}
+
+string AocDay14::part1(string filename, vector<string> extra_args)
+{
+    string initial_polymer;
+    map<string, Rule> rules;
     
+    parse_input(filename, initial_polymer, rules);
     
+    long result = perform_processing(initial_polymer, rules, 10); // 10 loops
     ostringstream out;
-    out << largest - smallest;
+    out << result;
+    return out.str();
+}
+
+string AocDay14::part2(string filename, vector<string> extra_args)
+{
+    string initial_polymer;
+    map<string, Rule> rules;
+    
+    parse_input(filename, initial_polymer, rules);
+    
+    long result = perform_processing(initial_polymer, rules, 40); // 40 loops
+    ostringstream out;
+    out << result;
     return out.str();
 }
