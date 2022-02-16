@@ -81,6 +81,7 @@ namespace Day15
     
     void Cavern::run_dijkstra(int start_row, int start_col)
     {
+        init_dijkstra();
         int row = start_row;
         int col = start_col;
         m_points[row][col].visited = true;
@@ -98,6 +99,7 @@ namespace Day15
                 {
                     m_points[row-1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row-1][col].risk_level;
                     m_points[row-1][col].from_direction = DIR_SOUTH; // coming from the south
+                    cout << " setting " << m_points[row-1][col].min_risk_to_here << " on north at " << row-1 << ", " << col << endl;
                 }
             }
             // check south
@@ -108,6 +110,7 @@ namespace Day15
                 {
                     m_points[row+1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row+1][col].risk_level;
                     m_points[row+1][col].from_direction = DIR_NORTH; // coming from the north
+                    cout << " setting " << m_points[row+1][col].min_risk_to_here << " on south at " << row+1 << ", " << col << endl;
                 }
             }
             // check west
@@ -118,6 +121,7 @@ namespace Day15
                 {
                     m_points[row][col-1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col-1].risk_level;
                     m_points[row][col-1].from_direction = DIR_EAST; // coming from the east
+                    cout << " setting " << m_points[row][col-1].min_risk_to_here << " on west at " << row << ", " << col-1 << endl;
                 }
             }
             // check east
@@ -128,6 +132,7 @@ namespace Day15
                 {
                     m_points[row][col+1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col+1].risk_level;
                     m_points[row][col+1].from_direction = DIR_WEST; // coming from the west
+                    cout << " setting " << m_points[row][col+1].min_risk_to_here << " on west at " << row << ", " << col+1 << endl;
                 }
             }
             
