@@ -83,6 +83,16 @@ The expand_input function will do the following
 
 The main loop will be changed to call the expand_input function right after parsing the input.
 
+### Part 2 optimizations for get_next_to_eval ###
+
+For Part 2, there were 250000 elements in the expanded map. I could no longer scan all 250000 elements every time I needed to get the next element for Dijkstra's algorithm.
+
+I realized that instead of bringing back one element with the lowest risk_level, I could bring back all of the elements with the minimum risk level. Since there are no negative risks, all of these elements would be the ones to evaluate had I called that function over and over.
+
+I changed the get_next_to_eval function to return that list of locations to points, and run_dijkstra to go over that list, and it sped up considerably.
+
 ## Things I learned ##
 
 So much fun implmenting Dijkstra's algorithm.
+
+Figuring out how to optimize the solution to not scan over all 250000 elements for day 15 part 2 every time I needed the next element.
