@@ -77,10 +77,11 @@ The expand_input function will do the following
     - Iterate col_copy from 0 to 4
         - Interate with row from 0 to num_rows
             - Iterate with col from 0 to num_cols
-                - Set points[row_copy*rows+row][col-copy*cols+col].risk_level to (points[row][col].risk_level + row + col)
+                - Set points[row_copy*rows+row][col-copy*cols+col].risk_level to (points[row][col].risk_level + row_copy + col_copy)
                 - If points[row_copy*rows+row][col-copy*cols+col].risk_level >= 10, subract 9 from it to reset the value to the 1-9 range
+- Reset rows and cols to multiply each by 5 for the expanded input
 
-The main loop will call the expand_input function right after parsing the input.
+The main loop will be changed to call the expand_input function right after parsing the input.
 
 ## Things I learned ##
 
