@@ -68,4 +68,4 @@
 14,2,day14_input.txt,2516901104210
 15,1,test_cases/day15_test1.txt,40
 15,1,day15_input.txt,410
-15,2,test_cases/day15_test2.txt,410
+15,2,test_cases/day15_test1.txt,315
