@@ -5,8 +5,9 @@
 
 #include <vector>
 #include <map>
+#include <utility>
 
-#define CAVERN_SIDE_LENGTH 100
+#define CAVERN_SIDE_LENGTH 500
 
 #define DIR_NONE 0
 #define DIR_NORTH 1
@@ -31,12 +32,13 @@ namespace Day15
             int m_rows;
             int m_cols;
             void init_dijkstra();
-            bool find_next_to_eval(int & next_row, int & next_col);
+            bool find_next_to_eval(int & next_risk, vector<pair<int, int>> & points);
         public:
             Cavern(vector<string> risks);
             ~Cavern();
             int get_rows();
             int get_cols();
+            void expand_input();
             void run_dijkstra(int start_row, int start_col);
             int get_min_distance(int row, int col);
     };
@@ -52,7 +54,7 @@ class AocDay15 : public AocDay
         AocDay15();
         ~AocDay15();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif

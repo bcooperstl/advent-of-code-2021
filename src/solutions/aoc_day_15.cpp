@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <climits>
+#include <utility>
 
 #include "aoc_day_15.h"
 #include "file_utils.h"
@@ -46,6 +47,31 @@ namespace Day15
         return m_points[row][col].min_risk_to_here;
     }
 
+    void Cavern::expand_input()
+    {
+        for (int row_copy=0; row_copy < 5; row_copy++)
+        {
+            for (int col_copy=0; col_copy < 5; col_copy++)
+            {
+                for (int row=0; row<m_rows; row++)
+                {
+                    for (int col=0; col<m_cols; col++)
+                    {
+                        m_points[row_copy*m_rows+row][col_copy*m_cols+col].risk_level=(m_points[row][col].risk_level + row_copy + col_copy);
+                        if (m_points[row_copy*m_rows+row][col_copy*m_cols+col].risk_level > 9)
+                        {
+                            m_points[row_copy*m_rows+row][col_copy*m_cols+col].risk_level-=9;
+                        }
+                        //cout << "points[" << row_copy*m_rows+row << "][" << col_copy*m_cols+col << "] is set to " <<m_points[row_copy*m_rows+row][col_copy*m_cols+col].risk_level << endl;
+                    }
+                }
+            }
+        }
+        
+        m_rows *= 5;
+        m_cols *= 5;
+    }
+    
     void Cavern::init_dijkstra()
     {
         for (int row=0; row<m_rows; row++)
@@ -60,23 +86,28 @@ namespace Day15
     }
         
     // return a non-visited point with the lowest min_risk_to_here value
-    bool Cavern::find_next_to_eval(int & next_row, int & next_col)
+    bool Cavern::find_next_to_eval(int & next_risk, vector<pair<int, int>> & points)
     {
-        int min_found_risk = INT_MAX;
+        next_risk = INT_MAX;
         for (int row=0; row<m_rows; row++)
         {
             for (int col=0; col<m_cols; col++)
             {
                 if ((!m_points[row][col].visited) && 
-                    (m_points[row][col].min_risk_to_here < min_found_risk))
+                    (m_points[row][col].min_risk_to_here < next_risk))
                 {
-                    min_found_risk = m_points[row][col].min_risk_to_here;
-                    next_row = row;
-                    next_col = col;
+                    points.clear();
+                    next_risk = m_points[row][col].min_risk_to_here;
+                    points.push_back(make_pair(row, col));
+                }
+                else if ((!m_points[row][col].visited) && 
+                    (m_points[row][col].min_risk_to_here == next_risk))
+                {
+                    points.push_back(make_pair(row, col));
                 }
             }
         }
-        return (min_found_risk != INT_MAX); // true if one found; false if not
+        return (next_risk != INT_MAX); // true if one found; false if not
     }
     
     void Cavern::run_dijkstra(int start_row, int start_col)
@@ -87,57 +118,70 @@ namespace Day15
         m_points[row][col].visited = true;
         m_points[row][col].min_risk_to_here = 0;
         m_points[row][col].from_direction = DIR_NONE;
+        int next_group_risk = 0;
+        vector<pair<int, int>> next_group;
+        next_group.push_back(make_pair(0,0));
         do
         {
-            cout << "Running on " << row << ", " << col << endl;
+            cout << "Risk level " << next_group_risk << " has " << next_group.size() << " elements" << endl;
             
-            // check north
-            if (row > 0)
+            for (int i=0; i<next_group.size(); i++)
             {
-                if ((!m_points[row-1][col].visited) &&
-                    (m_points[row-1][col].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row-1][col].risk_level)))
-                {
-                    m_points[row-1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row-1][col].risk_level;
-                    m_points[row-1][col].from_direction = DIR_SOUTH; // coming from the south
-                    cout << " setting " << m_points[row-1][col].min_risk_to_here << " on north at " << row-1 << ", " << col << endl;
-                }
-            }
-            // check south
-            if (row < (m_rows - 1))
-            {
-                if ((!m_points[row+1][col].visited) &&
-                    (m_points[row+1][col].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row+1][col].risk_level)))
-                {
-                    m_points[row+1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row+1][col].risk_level;
-                    m_points[row+1][col].from_direction = DIR_NORTH; // coming from the north
-                    cout << " setting " << m_points[row+1][col].min_risk_to_here << " on south at " << row+1 << ", " << col << endl;
-                }
-            }
-            // check west
-            if (col > 0)
-            {
-                if ((!m_points[row][col-1].visited) &&
-                    (m_points[row][col-1].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row][col-1].risk_level)))
-                {
-                    m_points[row][col-1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col-1].risk_level;
-                    m_points[row][col-1].from_direction = DIR_EAST; // coming from the east
-                    cout << " setting " << m_points[row][col-1].min_risk_to_here << " on west at " << row << ", " << col-1 << endl;
-                }
-            }
-            // check east
-            if (col < (m_cols - 1))
-            {
-                if ((!m_points[row][col+1].visited) &&
-                    (m_points[row][col+1].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row][col+1].risk_level)))
-                {
-                    m_points[row][col+1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col+1].risk_level;
-                    m_points[row][col+1].from_direction = DIR_WEST; // coming from the west
-                    cout << " setting " << m_points[row][col+1].min_risk_to_here << " on west at " << row << ", " << col+1 << endl;
-                }
-            }
+                row = next_group[i].first;
+                col = next_group[i].second;
             
-            m_points[row][col].visited = true;
-        } while (find_next_to_eval(row, col));
+                //cout << "Running on " << row << ", " << col << endl;
+                
+                // check north
+                if (row > 0)
+                {
+                    if ((!m_points[row-1][col].visited) &&
+                        (m_points[row-1][col].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row-1][col].risk_level)))
+                    {
+                        m_points[row-1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row-1][col].risk_level;
+                        m_points[row-1][col].from_direction = DIR_SOUTH; // coming from the south
+                        //cout << " setting " << m_points[row-1][col].min_risk_to_here << " on north at " << row-1 << ", " << col << endl;
+                    }
+                }
+                // check south
+                if (row < (m_rows - 1))
+                {
+                    if ((!m_points[row+1][col].visited) &&
+                        (m_points[row+1][col].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row+1][col].risk_level)))
+                    {
+                        m_points[row+1][col].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row+1][col].risk_level;
+                        m_points[row+1][col].from_direction = DIR_NORTH; // coming from the north
+                        //cout << " setting " << m_points[row+1][col].min_risk_to_here << " on south at " << row+1 << ", " << col << endl;
+                    }
+                }
+                // check west
+                if (col > 0)
+                {
+                    if ((!m_points[row][col-1].visited) &&
+                        (m_points[row][col-1].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row][col-1].risk_level)))
+                    {
+                        m_points[row][col-1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col-1].risk_level;
+                        m_points[row][col-1].from_direction = DIR_EAST; // coming from the east
+                        //cout << " setting " << m_points[row][col-1].min_risk_to_here << " on west at " << row << ", " << col-1 << endl;
+                    }
+                }
+                // check east
+                if (col < (m_cols - 1))
+                {
+                    if ((!m_points[row][col+1].visited) &&
+                        (m_points[row][col+1].min_risk_to_here > (m_points[row][col].min_risk_to_here + m_points[row][col+1].risk_level)))
+                    {
+                        m_points[row][col+1].min_risk_to_here = m_points[row][col].min_risk_to_here + m_points[row][col+1].risk_level;
+                        m_points[row][col+1].from_direction = DIR_WEST; // coming from the west
+                        //cout << " setting " << m_points[row][col+1].min_risk_to_here << " on west at " << row << ", " << col+1 << endl;
+                    }
+                }
+                
+                
+                m_points[row][col].visited = true;
+            }
+            next_group.clear();
+        } while (find_next_to_eval(next_group_risk, next_group));
     }
 };
 
@@ -168,6 +212,19 @@ string AocDay15::part1(string filename, vector<string> extra_args)
     vector<string> input = read_input(filename);
     Cavern cavern(input);
     
+    cavern.run_dijkstra(0,0);
+    
+    ostringstream out;
+    out << cavern.get_min_distance(cavern.get_rows()-1, cavern.get_cols()-1);
+    return out.str();
+}
+
+string AocDay15::part2(string filename, vector<string> extra_args)
+{
+    vector<string> input = read_input(filename);
+    Cavern cavern(input);
+    
+    cavern.expand_input();
     cavern.run_dijkstra(0,0);
     
     ostringstream out;
