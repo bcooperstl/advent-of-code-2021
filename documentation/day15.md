@@ -43,7 +43,7 @@ There will be a point structure which will store the data for each position in t
 - risk_level - which gives the cost of entering this cell
 - visited - boolean indicating if the cell has been checked yet for Dijkstra's algorithm
 - min_risk_to_here - interver value of the minimal risk to get to this cell from the Dijkstra's algorithm origin cell
-- neighbor_direction - either NORTH, SOUTH, EAST, or WEST, indiating the path to this cell for Dijkstra's algorithm
+- from_direction - either NORTH, SOUTH, EAST, or WEST, indiating the path to this cell for Dijkstra's algorithm
 
 There will be a cavern class with the following:
 - 2-D array of points, corresponding to the world. The max size is 100x100
@@ -51,6 +51,7 @@ There will be a cavern class with the following:
 - cols - number of columns in the cavern
 - run_dijkstra function, which is given a starting location and will calculate the shortest distance to every point
 - init_dijkstra function - used to clear the visited, min_risk_to_here, and neighbor_direction values for all points
+- find_next_to_eval - used for dijkstra's algorithm to find the next point to evaluate
 - get_min_distance - is passed a row and column, and will return the previously calculated minimum distance from the Dijkstra algorithm
 
 ### Main processing ###
