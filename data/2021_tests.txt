@@ -77,3 +77,4 @@
 16,1,test_cases/day16_test5.txt,12
 16,1,test_cases/day16_test6.txt,23
 16,1,test_cases/day16_test7.txt,31
+16,1,day16_input.txt,945
