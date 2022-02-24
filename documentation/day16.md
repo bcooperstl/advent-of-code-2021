@@ -101,19 +101,19 @@ Functionality:
 - If *type_id* is 4, we have a literal value
     - Initialize *value* to 0, *group_ind* to 0
     - do
-        - set *group_ind* to *input[bits_consumed]*
-        - convert *input[bits_consumed+1] to input[bits_consumed+4]* to an integer *group_value*
+        - set *group_ind* to *input[start_pos+bits_consumed]*
+        - convert *input[start_pos+bits_consumed+1] to input[start_pos+bits_consumed+4]* to an integer *group_value*
         - multiply *value* by 16 and add *group_value*
         - increment *bits_consumed* by 5
     - while *group_ind* equals 1 (this one was not yet the last group)
     - Create a LiteralPacket *packet* from *version*, *type_id*, and *value*
 - Else, we have an operator packet
     - Create an OperatorPacket *packet* from *version* and *type_id*.
-    - Store *input[bits_consumed]* in *length_type*.
+    - Store *input[start_pos+bits_consumed]* in *length_type*.
     - Increment *bits_consumed*
     - If *length_type* is 0, this packet uses bit length counting.
-        - Convert *inputs[bits_consumed] to input[bits_consumed+14]* to an integer and store in *subpacket_bits*
-        - Intrement *bits_consumed* by 15
+        - Convert *input[start_pos+bits_consumed] to input[start_pos+bits_consumed+14]* to an integer and store in *subpacket_bits*
+        - Increment *bits_consumed* by 15
         - Set *used_subpacket_bits* to 0
         - While *used_subpacket_bits* < *subpacket_bits*
             - Call create_packet, passing in *start_position + bits_consumed* as its input *start_position* value. 
@@ -121,8 +121,8 @@ Functionality:
             - Increment both *bits_consumed* and *used_subpacket_bits* by *current_subpacket_bits*
             - Add *subpacket* to *packet* as a sub-packet
     - Else, this packet uses sub-packet counting
-        - Convert *inputs[bits_consumed] to input[bits_consumed+10]* to an integer and store in *subpackets*
-        - Intrement *bits_consumed* by 11
+        - Convert *input[start_pos+bits_consumed] to input[start_pos+bits_consumed+10]* to an integer and store in *subpackets*
+        - Increment *bits_consumed* by 11
         - Set *used_subpackets* to 0
         - While *used_subpackets* < *subpackets*
             - Call create_packet, passing in *start_position + bits_consumed* as its input *start_position* value. 
