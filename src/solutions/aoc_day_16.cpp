@@ -156,7 +156,7 @@ Packet * AocDay16::create_packet(string input, int start_position, int & bits_co
             bits_consumed += 5;
             cout << "Literal group - indicator is " << group_ind 
                  << " results in group value " << group_value_str 
-                 << "converted to " << group_value 
+                 << " converted to " << group_value 
                  << " and value increased to " << value << endl;
         } while (group_ind == '1');
         packet = new LiteralPacket(version, type_id, value);
