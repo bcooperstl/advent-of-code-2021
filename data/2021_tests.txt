@@ -78,3 +78,11 @@
 16,1,test_cases/day16_test6.txt,23
 16,1,test_cases/day16_test7.txt,31
 16,1,day16_input.txt,945
+16,2,test_cases/day16_test8.txt,3
+16,2,test_cases/day16_test9.txt,54
+16,2,test_cases/day16_test10.txt,7
+16,2,test_cases/day16_test11.txt,9
+16,2,test_cases/day16_test12.txt,1
+16,2,test_cases/day16_test13.txt,0
+16,2,test_cases/day16_test14.txt,0
+16,2,test_cases/day16_test15.txt,1
