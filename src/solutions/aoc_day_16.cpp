@@ -35,7 +35,7 @@ namespace Day16
         return m_type_id;
     }
     
-    LiteralPacket::LiteralPacket(int version, int type_id, int value):Packet(version, type_id)
+    LiteralPacket::LiteralPacket(int version, int type_id, long value):Packet(version, type_id)
     {
         m_value = value;
     }
@@ -44,7 +44,7 @@ namespace Day16
     {
     }
     
-    int LiteralPacket::get_value()
+    long LiteralPacket::get_value()
     {
         return m_value;
     }
@@ -81,9 +81,9 @@ namespace Day16
         return sum;
     }
     
-    int OperatorPacket::get_value()
+    long OperatorPacket::get_value()
     {
-        int value = 0;
+        long value = 0;
         switch (m_type_id)
         {
             case 0: // sum
@@ -104,7 +104,7 @@ namespace Day16
                 value = m_subpackets[0]->get_value();
                 for (int i=1; i<m_subpackets.size(); i++)
                 {
-                    int other = m_subpackets[i]->get_value();
+                    long other = m_subpackets[i]->get_value();
                     if (other < value)
                     {
                         value = other;
@@ -115,7 +115,7 @@ namespace Day16
                 value = m_subpackets[0]->get_value();
                 for (int i=1; i<m_subpackets.size(); i++)
                 {
-                    int other = m_subpackets[i]->get_value();
+                    long other = m_subpackets[i]->get_value();
                     if (other > value)
                     {
                         value = other;
@@ -198,14 +198,14 @@ Packet * AocDay16::create_packet(string input, int start_position, int & bits_co
     
     if (type_id == 4) // literal packet
     {
-        int value = 0;
+        long value = 0;
         char group_ind = '0';
         do
         {
             group_ind = input[start_position+bits_consumed];
             string group_value_str = input.substr(start_position+bits_consumed+1, 4);
-            int group_value = strtol(group_value_str.c_str(), NULL, 2);
-            value *= 16;
+            long group_value = strtol(group_value_str.c_str(), NULL, 2);
+            value *= 16l; // 16 as a long
             value += group_value;
             bits_consumed += 5;
             cout << "Literal group - indicator is " << group_ind 
@@ -280,6 +280,8 @@ string AocDay16::part2(string filename, vector<string> extra_args)
     int bits_used;
     Packet * packet = create_packet(binary, 0, bits_used);
     
+    cout << "There were " << bits_used << " of " << binary.length() << " bits used in creating the outer packet" << endl;
+
     ostringstream out;
     out << packet->get_value();
     delete packet;

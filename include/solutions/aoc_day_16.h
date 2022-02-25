@@ -20,18 +20,18 @@ namespace Day16
             int get_version();
             int get_type_id();
             virtual int get_version_sum() = 0;
-            virtual int get_value() = 0;
+            virtual long get_value() = 0;
     };
     
     class LiteralPacket : public Packet
     {
         protected:
-            int m_value;
+            long m_value;
         public:
-            LiteralPacket(int version, int type_id, int value);
+            LiteralPacket(int version, int type_id, long value);
             virtual ~LiteralPacket();
             virtual int get_version_sum();
-            virtual int get_value();
+            virtual long get_value();
     };
     
     class OperatorPacket : public Packet
@@ -43,7 +43,7 @@ namespace Day16
             virtual ~OperatorPacket();
             void add_subpacket(Packet * packet);
             virtual int get_version_sum();
-            virtual int get_value();
+            virtual long get_value();
     };
 }
 
