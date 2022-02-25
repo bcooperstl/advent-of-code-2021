@@ -83,8 +83,56 @@ namespace Day16
     
     int OperatorPacket::get_value()
     {
-        
-        return 0;
+        int value = 0;
+        switch (m_type_id)
+        {
+            case 0: // sum
+                value = 0;
+                for (int i=0; i<m_subpackets.size(); i++)
+                {
+                    value+=m_subpackets[i]->get_value();
+                }
+                break;
+            case 1: // product
+                value = 1;
+                for (int i=0; i<m_subpackets.size(); i++)
+                {
+                    value*=m_subpackets[i]->get_value();
+                }
+                break;
+            case 2: // minimum
+                value = m_subpackets[0]->get_value();
+                for (int i=1; i<m_subpackets.size(); i++)
+                {
+                    int other = m_subpackets[i]->get_value();
+                    if (other < value)
+                    {
+                        value = other;
+                    }
+                }
+                break;
+            case 3: // maximum
+                value = m_subpackets[0]->get_value();
+                for (int i=1; i<m_subpackets.size(); i++)
+                {
+                    int other = m_subpackets[i]->get_value();
+                    if (other > value)
+                    {
+                        value = other;
+                    }
+                }
+                break;
+            case 5: // greater-than
+                value = (m_subpackets[0]->get_value() > m_subpackets[1]->get_value() ? 1 : 0);
+                break;
+            case 6: // less-than
+                value = (m_subpackets[0]->get_value() < m_subpackets[1]->get_value() ? 1 : 0);
+                break;
+            case 7: // equal-to
+                value = (m_subpackets[0]->get_value() == m_subpackets[1]->get_value() ? 1 : 0);
+                break;
+        }
+        return value;
     }
 };
 
@@ -209,7 +257,6 @@ Packet * AocDay16::create_packet(string input, int start_position, int & bits_co
     return packet;
 }
 
-
 string AocDay16::part1(string filename, vector<string> extra_args)
 {
     string input_hex = read_input(filename);
@@ -221,6 +268,20 @@ string AocDay16::part1(string filename, vector<string> extra_args)
     
     ostringstream out;
     out << packet->get_version_sum();
+    delete packet;
+    return out.str();
+}
+
+string AocDay16::part2(string filename, vector<string> extra_args)
+{
+    string input_hex = read_input(filename);
+    string binary = convert_hex_to_binary(input_hex);
+    
+    int bits_used;
+    Packet * packet = create_packet(binary, 0, bits_used);
+    
+    ostringstream out;
+    out << packet->get_value();
     delete packet;
     return out.str();
 }
