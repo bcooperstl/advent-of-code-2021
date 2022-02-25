@@ -20,6 +20,7 @@ namespace Day16
             int get_version();
             int get_type_id();
             virtual int get_version_sum() = 0;
+            virtual int get_value() = 0;
     };
     
     class LiteralPacket : public Packet
@@ -29,8 +30,8 @@ namespace Day16
         public:
             LiteralPacket(int version, int type_id, int value);
             virtual ~LiteralPacket();
-            int get_value();
             virtual int get_version_sum();
+            virtual int get_value();
     };
     
     class OperatorPacket : public Packet
@@ -42,6 +43,7 @@ namespace Day16
             virtual ~OperatorPacket();
             void add_subpacket(Packet * packet);
             virtual int get_version_sum();
+            virtual int get_value();
     };
 }
 

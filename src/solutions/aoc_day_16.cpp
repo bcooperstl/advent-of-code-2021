@@ -80,6 +80,12 @@ namespace Day16
         }
         return sum;
     }
+    
+    int OperatorPacket::get_value()
+    {
+        
+        return 0;
+    }
 };
 
 AocDay16::AocDay16():AocDay(16)
