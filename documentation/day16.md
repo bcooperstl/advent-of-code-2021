@@ -25,6 +25,19 @@ Given the input, we are to parse through and create the heirarchy, and then outp
 
 ## Part 2 Requirements ##
 
+Building on from part 1, we will now continue to be able to evaulate the operator packets and compute the result.
+
+Operator packets behave as follows:
+- Type 0 - sum - value is the sum of their sub-packets' values.
+- Type 1 - product - value is the product of their sub-packets' values.
+- Type 2 - minimum - value is the minimum of their sub-packets' values.
+- Type 3 - maximum - value is the maximum of their sub-packets' values.
+- Type 5 - greater-than - always has 2 sub-packets; return 1 if the first sub-packet's value is greater than the second sub-packet's value. if not, return 0
+- Type 6 - less-than - always has 2 sub-packets; return 1 if the first sub-packet's value is less than the second sub-packet's value. if not, return 0
+- Type 7 - equal-to - always has 2 sub-packets; return 1 if the first sub-packet's value equals the second sub-packet's value. if not, return 0
+
+Given the input, we are to compute the final result of the packet and then output that result.
+
 ### Input Format ###
 
 The input string is a hexidecimal message containing all of the packets. It is all on one line.
@@ -37,6 +50,7 @@ Number - the sum of the version numbers for all of the packets.
 
 #### Part 2 ####
 
+Number - the result of the expression for the outer packet.
 
 ## Test Cases ##
 
@@ -50,6 +64,16 @@ There are seven provided examples for part 1:
 - [5](../data/test_cases/day16_test5.txt).
 - [6](../data/test_cases/day16_test6.txt).
 - [7](../data/test_cases/day16_test7.txt).
+
+There are either more examples for part 2:
+- [sum](../data/test_cases/day16_test8.txt).
+- [product](../data/test_cases/day16_test9.txt).
+- [minimum](../data/test_cases/day16_test10.txt).
+- [maximum](../data/test_cases/day16_test11.txt).
+- [greater-than](../data/test_cases/day16_test12.txt).
+- [less-than](../data/test_cases/day16_test13.txt).
+- [equal-to](../data/test_cases/day16_test14.txt).
+- [combined example](../data/test_cases/day16_test15.txt).
 
 ### Custom Test Cases ###
 
@@ -74,6 +98,7 @@ Packet base class will contain:
 - type ID
 - getters for the above
 - virtual method to return sum of version numbers for this packet and all sub-packets
+- *Added in Part 2* virtual method to return the value for the packet
 
 LiteralPacket subclass will inherit from Packet and also contain:
 - value
@@ -132,12 +157,45 @@ Functionality:
             - Add *subpacket* to *packet* as a sub-packet
 - Return *packet*.
 
-### Main Loop ###
+### OperatorPacket get_value method ###
+
+This is added in part 2 and performs the operations.
+
+- Declare *value*
+- Switch based on *type_id*
+    - Case 0: Sum
+        - Init *value* to 0
+        - Loop over all of the sub-packets, calling their get_value function and adding that result to *value*, storing the result in *value*
+    - Case 1: Product
+        - Init *value* to 1
+        - Loop over all of the sub-packets, calling their get_value function and multiplying that result by *value*, storing the result in *value*
+    - Case 2: Minimum
+        - Set *value* to the first sub-packets's get_value result.
+        - Loop over the remaining sub-packets, and if their get_value result is less than *value*, replace *value* with the smaller result.
+    - Case 3: Maximum
+        - Set *value* to the first sub-packets's get_value result.
+        - Loop over the remaining sub-packets, and if their get_value result is greater than *value*, replace *value* with the larger result.
+    - Case 5: Greater-Than
+        - Set *value* to 1 if the first sub-packet's get_value result is greater than the second sub-packet's get_value result. If not, set it to 0.
+    - Case 6: Less-Than
+        - Set *value* to 1 if the first sub-packet's get_value result is less than the second sub-packet's get_value result. If not, set it to 0.
+    - Case 7: Equal-To
+        - Set *value* to 1 if the first sub-packet's get_value result equals the second sub-packet's get_value result. If not, set it to 0.
+- Return *value*.
+
+### Part 1 Main Loop ###
 
 - Read in the input from the file into a string *hex*
 - Convert the *hex* string to *binary* string
 - Call the create_packet function passing in *binary* and starting at position 0. Store the result in *packet*.
 - **Output** the result of the sum of the version numbers being called on *packet*.
+
+### Part 2 Main Loop ###
+
+- Read in the input from the file into a string *hex*
+- Convert the *hex* string to *binary* string
+- Call the create_packet function passing in *binary* and starting at position 0. Store the result in *packet*.
+- **Output** the result of the get_value function being called on *packet*.
 
 ## Things I learned ##
 
