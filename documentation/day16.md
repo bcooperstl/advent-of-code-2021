@@ -201,3 +201,4 @@ This is added in part 2 and performs the operations.
 
 So much fun designing the algorithm to handle the parsing of the packets.
 
+When in doubt - make everything a long. I had overflow issue with using ints.
