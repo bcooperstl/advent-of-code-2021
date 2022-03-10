@@ -88,3 +88,4 @@
 16,2,test_cases/day16_test15.txt,1
 16,2,day16_input.txt,10637009915279
 17,1,test_cases/day17_test1.txt,45
+17,1,day17_input.txt,7750
