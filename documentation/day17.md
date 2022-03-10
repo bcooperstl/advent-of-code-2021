@@ -57,22 +57,22 @@ I'll increase this by 1 each time, until I get to a point where after the initia
 ### Map steps to X velocities ###
 
 - Initialize a *steps_to_velocities* map
-- Loop from *maximum_target_x* down to 1 with *start_x_velocity*
+- Loop from *target_maximum_x* down to 1 with *start_x_velocity*
     - set *current_x_velocity* to *start_x_velocity*
     - set *current_x_position* to 0
     - set *steps* to 0
-    - while *current_x_velocity* > 0 and *current_x_position* < *maximum_target_x*
+    - while *current_x_velocity* > 0 and *current_x_position* < *target_maximum_x*
         - increment *steps* by 1
         - increment *current_x_position* by *current_x_velocity*
         - decrement *current_x_velocity* by 1
-        - if *currrent_x_position* between *minimum_target_x* and *maximum_target_x* we have a starting velocity that will lead to the target area in *steps* steps
+        - if *currrent_x_position* between *target_minimum_x* and *target_maximum_x* we have a starting velocity that will lead to the target area in *steps* steps
             - if *steps_to_velocities* map does not have an entry for *steps*
                 - map *steps* to *start_x_velocity* in the *steps_to_velocities* map.
 - return the *steps_to_velocities* map
 
 ### Check if Y velocity results in a hit ###
 
-- takes *x_steps_to_velocity*, *max_steps*, *start_y_velocity*, *minimum_target_y* and *maximum_target_y* as inputs
+- takes *x_steps_to_velocity*, *max_steps*, *start_y_velocity*, *target_minimum_y* and *target_maximum_y* as inputs
 - returns true/false for it is hits the target, a true/false overshoot boolean, and peak_height for the highest point
 - set *peak_height* to 0
 - set *steps* to 0
@@ -93,12 +93,12 @@ I'll increase this by 1 each time, until I get to a point where after the initia
 - set true for overshoot and return false for hitting the target
 
 ### Main Loop ###
-- Read in the input file and parse into *minimum_target_x*, *maximum_target_x*, *minimum_target_y*, and *maximum_target_y*
+- Read in the input file and parse into *target_minimum_x*, *target_maximum_x*, *target_minimum_y*, and *target_maximum_y*
 - map the steps to x velociites and store in *x_steps_to_velocities*
 - find the maximum key in *x_steps_to_velocities* and store in *max_steps*
 - set *max_peak_height* to 0
 - set *overshoot* to false
-- set *start_y_velocity* to *minimum_target_y(
+- set *start_y_velocity* to *target_minimum_y(
 - while *overshoot* is false
     - call *check_y_velocity_hits* storing results in *is_hit*, *overshoot*, and *peak_height*
     - if *is_hit* is true
