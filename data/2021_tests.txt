@@ -90,3 +90,4 @@
 17,1,test_cases/day17_test1.txt,45
 17,1,day17_input.txt,7750
 17,2,test_cases/day17_test1.txt,112
+17,2,day17_input.txt,4120
