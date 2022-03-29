@@ -74,7 +74,7 @@ These cases test the exploding function, doing one explode action.
 
 #### Splitting ####
 
-These cases test the splitting function, doing one split action.
+These cases test the splitting function, doing one split action. Note that since all inputa are assumed to be 0-9, these will be given in hexidecimal instead of two-digit numbers.
 
 [1](../data/test_cases/day18_split1.txt), 
 [2](../data/test_cases/day18_split2.txt), 
@@ -114,7 +114,59 @@ There is one test case that does a [complete test](../data/test_cases/day18_test
 
 ## Approach ##
 
+### Data structures ###
+
+I will create a *node* base class, which can have two inherited classes: *pair* and *number*.
+A *node* will have:
+-a virtual *to_string* method, for dumping a node to a string.
+
+A *number* will have:
+-a *value* that corresponds to its numberical value.
+-a *to_string* method, 
+
+A *pair* will have:
+-an array of two *members* to correspond to its left and right elements. These will be type *node \** because a pair can have pairs.
+-a *depth* value to correspond to the depth of each pair. also include getter and setter
+-a *get_string* method that will return a string that corresponds to the 
+
+### Input parsing ###
+
+I will read each line as a string, and then create a *pair* from the input string.
+
+#### Processing the line ####
+
+Note that by inspection, all input values are in the range 0-9. 
+
+- Create an array of *pair \** *current_pairs* length 5 (will skip 0)
+- Create a new *pair* called *base* with depth 1
+- Create an array of booleans *set_left* length 5, and set all to false.
+- Store *base* in *current_pairs[1]*
+- Set *current_depth* to 1
+- Set *position* to 1 (skip the first \[ character)
+- while *position* < length of input
+    - if *input[position]* is a digit
+        - Create a *number* from *input[position]*
+        - if *set_left[current_depth]* is false
+            - Store this *number* at *current_pairs[current_depth].left*
+            - set *set_left[current_depth]* to true.
+        - else
+            - Store this *number* at *current_pairs[current_depth].right*
+    - else if *input[position]* is `[`, we are starting a new pair
+        - Create a *pair* with depth set to *current_depth + 1*
+        - if *set_left[current_depth]* is false
+            - Store this *pair* at *current_pairs[current_depth].left*
+            - set *set_left[current_depth]* to true.
+        - else
+            - Store this *pair* at *current_pairs[current_depth].right*
+        - increment *current_depth*
+        - store this *pair* at *current_pairs[current_depth]*
+        - set *set_left[current_depth]* to false
+    - else if *input[position]* is `]`, we are starting a closing a pair
+        - decrement *current_depth*
+- return *base*
 
 ## Things I learned ##
 
+Doing this with test-driven development to make up all of the unique test cases for each portion.
 
+Doing an interative approach, to make sure each step functions on its own before moving on.
