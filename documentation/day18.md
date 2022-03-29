@@ -163,6 +163,7 @@ Note that by inspection, all input values are in the range 0-9.
         - set *set_left[current_depth]* to false
     - else if *input[position]* is `]`, we are starting a closing a pair
         - decrement *current_depth*
+    - increment position
 - return *base*
 
 ## Things I learned ##
