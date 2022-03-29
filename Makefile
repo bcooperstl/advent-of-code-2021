@@ -167,6 +167,12 @@ build/solutions/aoc_day_17.o: src/solutions/aoc_day_17.cpp  \
 	include/common/constants.h
 	g++ ${CPPFLAGS} -o build/solutions/aoc_day_17.o -c src/solutions/aoc_day_17.cpp
 
+build/solutions/aoc_day_18.o: src/solutions/aoc_day_18.cpp  \
+	include/solutions/aoc_day_18.h \
+	include/solutions/aoc_day.h \
+	include/common/constants.h
+	g++ ${CPPFLAGS} -o build/solutions/aoc_day_18.o -c src/solutions/aoc_day_18.cpp
+
 bin/lib/libsolutions.a: build/solutions/aoc_day.o  \
 	build/solutions/aoc_day_1.o \
 	build/solutions/aoc_day_2.o \
@@ -185,6 +191,7 @@ bin/lib/libsolutions.a: build/solutions/aoc_day.o  \
 	build/solutions/aoc_day_15.o \
 	build/solutions/aoc_day_16.o \
 	build/solutions/aoc_day_17.o \
+	build/solutions/aoc_day_18.o \
 	build/solutions/aoc_days.o
 	ar rcs bin/lib/libsolutions.a $^
 
@@ -227,6 +234,7 @@ clean:
 	build/solutions/aoc_day_15.o \
 	build/solutions/aoc_day_16.o \
 	build/solutions/aoc_day_17.o \
+	build/solutions/aoc_day_18.o \
 	build/solutions/aoc_days.o  \
 	build/aoc.o  \
 	bin/lib/librunner.a  \
@@ -257,6 +265,7 @@ all: build/runner/aoc_test.o  \
 	build/solutions/aoc_day_15.o \
 	build/solutions/aoc_day_16.o \
 	build/solutions/aoc_day_17.o \
+	build/solutions/aoc_day_18.o \
 	build/solutions/aoc_days.o  \
 	build/aoc.o  \
 	bin/lib/librunner.a  \
