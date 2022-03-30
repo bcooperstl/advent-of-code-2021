@@ -35,11 +35,21 @@ namespace Day18
         return m_value;
     }
     
+    void Number::set_value(long value)
+    {
+        m_value = value;
+    }
+    
     string Number::to_string()
     {
         ostringstream out;
         out << m_value;
         return out.str();
+    }
+    
+    int Number::get_type()
+    {
+        return TYPE_NUMBER;
     }
     
     Pair::Pair() 
@@ -97,6 +107,89 @@ namespace Day18
         out << ']';
         return out.str();
     }
+    
+    int Pair::get_type()
+    {
+        return TYPE_PAIR;
+    }
+    
+    void Pair::build_number_list(vector<Number *> & numbers)
+    {
+        if (m_members[LEFT]->get_type() == TYPE_NUMBER)
+        {
+            numbers.push_back((Number *)m_members[LEFT]);
+        }
+        else
+        {
+            ((Pair *)m_members[LEFT])->build_number_list(numbers);
+        }
+
+        if (m_members[RIGHT]->get_type() == TYPE_NUMBER)
+        {
+            numbers.push_back((Number *)m_members[RIGHT]);
+        }
+        else
+        {
+            ((Pair *)m_members[RIGHT])->build_number_list(numbers);
+        }
+    }
+    
+    Pair * Pair::find_parent(Node * target)
+    {
+        if (m_members[LEFT] == target || m_members[RIGHT] == target)
+        {
+            return this;
+        }
+        
+        if (m_members[LEFT]->get_type() == TYPE_PAIR)
+        {
+            Pair * result = ((Pair *)m_members[LEFT])->find_parent(target);
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        
+        if (m_members[RIGHT]->get_type() == TYPE_PAIR)
+        {
+            Pair * result = ((Pair *)m_members[RIGHT])->find_parent(target);
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        
+        return NULL;
+    }
+
+    Pair * Pair::find_first_to_explode()
+    {
+        if (m_depth == 5)
+        {
+            return this;
+        }
+        
+        if (m_members[LEFT]->get_type() == TYPE_PAIR)
+        {
+            Pair * result = ((Pair *)m_members[LEFT])->find_first_to_explode();
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        
+        if (m_members[RIGHT]->get_type() == TYPE_PAIR)
+        {
+            Pair * result = ((Pair *)m_members[RIGHT])->find_first_to_explode();
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        
+        return NULL;
+    }
+    
 };
 
 AocDay18::AocDay18():AocDay(18)
@@ -189,6 +282,37 @@ Pair * AocDay18::convert_line(string input)
     return base;
 }
 
+void AocDay18::explode(Pair * base, Pair * target)
+{
+    vector<Number *> numbers;
+    Number * left_number = (Number *) target->get_member(LEFT);
+    Number * right_number = (Number *) target->get_member(RIGHT);
+    
+    base->build_number_list(numbers);
+    for (int num=0; num<numbers.size(); num++)
+    {
+        if (numbers[num] == left_number && num > 0)
+        {
+            numbers[num-1]->set_value(numbers[num-1]->get_value() + left_number->get_value());
+        }
+        if (numbers[num] == right_number && num < (numbers.size() - 1))
+        {
+            numbers[num+1]->set_value(numbers[num+1]->get_value() + right_number->get_value());
+        }
+    }
+    Pair * parent = base->find_parent(target);
+    Number * zero = new Number(0);
+    if (parent->get_member(LEFT) == target)
+    {
+        parent->set_member(zero, LEFT);
+    }
+    else
+    {
+        parent->set_member(zero, RIGHT);
+    }
+    delete target;
+}
+
 string AocDay18::run_test(string filename, string test)
 {
     if (test == "parse")
@@ -199,6 +323,22 @@ string AocDay18::run_test(string filename, string test)
         delete inputs[0];
         return ret;
     }
+    if (test == "explode")
+    {
+        vector<Pair *> inputs = parse_input(filename);
+        
+        Pair * first_to_explode = inputs[0]->find_first_to_explode();
+        if (first_to_explode == NULL)
+        {
+            cerr << "No node found to explode for test" << endl;
+        }
+        explode(inputs[0], first_to_explode);
+        
+        string ret = inputs[0]->to_string();
+        delete inputs[0];
+        return ret;
+    }
+        
     return "";
 }
 
