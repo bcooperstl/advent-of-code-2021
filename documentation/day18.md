@@ -239,6 +239,16 @@ It will also handle the reducing by exploding and splitting.
 
 This is a simple recusrive function to calculate the magnitude with the formula *3 \* left + 2 \* right*.
 
+### Main program for part 1 ###
+
+- Read in the input file in *inputs*
+- Clone the first input pair into *running_sum*
+- Loop over the remaining inputs with *i*
+    - store *running_sum + i* into *current
+    - delete *running_sum*
+    - set *running_sum* to *current*
+- **OUTPUT** the magnitude of *running_sum* and clean up memory
+
 ## Things I learned ##
 
 Doing this with test-driven development to make up all of the unique test cases for each portion.

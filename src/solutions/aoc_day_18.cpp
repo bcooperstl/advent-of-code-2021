@@ -523,7 +523,26 @@ string AocDay18::part1(string filename, vector<string> extra_args)
     {
         return run_test(filename, extra_args[0]);
     }
+    
+    vector<Pair *> inputs = parse_input(filename);
+        
+    Pair * running_sum = (Pair *)inputs[0]->clone();
+    
+    for (int i=1; i<inputs.size(); i++)
+    {
+        Pair * current = sum(running_sum, inputs[i]);
+        delete running_sum;
+        running_sum = current;
+    }
+    
     ostringstream out;
-    out << "";
+    out << running_sum->get_magnitude();
+    
+    delete running_sum;
+    for (int i=0; i<inputs.size(); i++)
+    {
+        delete inputs[i];
+    }
+    
     return out.str();
 }
