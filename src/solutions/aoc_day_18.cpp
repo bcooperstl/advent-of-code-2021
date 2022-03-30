@@ -52,6 +52,12 @@ namespace Day18
         return TYPE_NUMBER;
     }
     
+    Node * Number::clone()
+    {
+        Number * clone = new Number(m_value);
+        return clone;
+    }
+    
     Pair::Pair() 
     {
         m_members[LEFT] = NULL;
@@ -113,6 +119,16 @@ namespace Day18
         return TYPE_PAIR;
     }
     
+    Node * Pair::clone()
+    {
+        Pair * clone = new Pair();
+        clone->set_depth(m_depth);
+        clone->set_member(m_members[LEFT]->clone(), LEFT);
+        clone->set_member(m_members[RIGHT]->clone(), RIGHT);
+        
+        return clone;
+    }
+
     void Pair::build_number_list(vector<Number *> & numbers)
     {
         if (m_members[LEFT]->get_type() == TYPE_NUMBER)
@@ -228,6 +244,19 @@ namespace Day18
         return NULL;
     }
     
+    void Pair::increment_depth()
+    {
+        m_depth++;
+        if (m_members[LEFT]->get_type() == TYPE_PAIR)
+        {
+            ((Pair *)m_members[LEFT])->increment_depth();
+        }
+        
+        if (m_members[RIGHT]->get_type() == TYPE_PAIR)
+        {
+            ((Pair *)m_members[RIGHT])->increment_depth();
+        }
+    }
 };
 
 AocDay18::AocDay18():AocDay(18)
@@ -371,6 +400,37 @@ void AocDay18::split(Pair * base, Number * target)
     delete target;
 }
 
+Pair * AocDay18::sum(Pair * first, Pair * second)
+{
+    Pair * sum = new Pair();
+    sum->set_depth(1);
+    sum->set_member(first->clone(), LEFT);
+    sum->set_member(second->clone(), RIGHT);
+    ((Pair *)sum->get_member(LEFT))->increment_depth();
+    ((Pair *)sum->get_member(RIGHT))->increment_depth();
+    cout << "Addition " << sum->to_string() << endl;
+    
+    Pair * to_explode = sum->find_first_to_explode();
+    Number * to_split = sum->find_first_to_split();
+    
+    while ((to_explode != NULL) || (to_split != NULL))
+    {
+        if (to_explode != NULL)
+        {
+            explode(sum, to_explode);
+            cout << "Explode " << sum->to_string() << endl;
+        }
+        else
+        {
+            split(sum, to_split);
+            cout << "Split " << sum->to_string() << endl;
+        }
+        to_explode = sum->find_first_to_explode();
+        to_split = sum->find_first_to_split();
+    }
+    return sum;
+}
+
 string AocDay18::run_test(string filename, string test)
 {
     if (test == "parse")
@@ -409,6 +469,28 @@ string AocDay18::run_test(string filename, string test)
         
         string ret = inputs[0]->to_string();
         delete inputs[0];
+        return ret;
+    }
+    if (test == "sum")
+    {
+        vector<Pair *> inputs = parse_input(filename);
+        
+        Pair * running_sum = (Pair *)inputs[0]->clone();
+        
+        for (int i=1; i<inputs.size(); i++)
+        {
+            Pair * current = sum(running_sum, inputs[i]);
+            delete running_sum;
+            running_sum = current;
+        }
+        
+        string ret = running_sum->to_string();
+        delete running_sum;
+        for (int i=0; i<inputs.size(); i++)
+        {
+            delete inputs[i];
+        }
+        
         return ret;
     }
         

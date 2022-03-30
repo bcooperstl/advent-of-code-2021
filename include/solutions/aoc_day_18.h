@@ -21,7 +21,7 @@ namespace Day18
             Node();
             ~Node();
             virtual string to_string() = 0;
-            //virtual Node * clone() = 0;
+            virtual Node * clone() = 0;
             virtual int get_type() = 0;
     };
     
@@ -35,7 +35,7 @@ namespace Day18
             long get_value();
             void set_value(long value);
             virtual string to_string();
-            //virtual Node * clone();
+            virtual Node * clone();
             virtual int get_type();
     };
     
@@ -54,13 +54,14 @@ namespace Day18
             void set_depth(int depth);
             
             virtual string to_string();
-            //virtual Node * clone();
+            virtual Node * clone();
             virtual int get_type();
             
             void build_number_list(vector<Number *> & numbers);
             Pair * find_parent(Node * target);
             Pair * find_first_to_explode();
             Number * find_first_to_split();
+            void increment_depth();
     };
 }
 
@@ -73,6 +74,7 @@ class AocDay18 : public AocDay
         Pair * convert_line(string input);
         void explode(Pair * base, Pair * target);
         void split(Pair * base, Number * target);
+        Pair * sum(Pair * first, Pair * second);
         string run_test(string filename, string test);
     public:
         AocDay18();
