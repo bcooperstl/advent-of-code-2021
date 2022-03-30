@@ -123,3 +123,4 @@
 18,1,test_cases/day18_mag9.txt,3488,mag
 18,1,test_cases/day18_test1.txt,[[[[6|6]|[7|6]]|[[7|7]|[7|0]]]|[[[7|7]|[7|7]]|[[7|8]|[9|9]]]],sum
 18,1,test_cases/day18_test1.txt,4140
+18,1,day18_input.txt,4641
