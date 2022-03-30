@@ -418,7 +418,7 @@ Pair * AocDay18::sum(Pair * first, Pair * second)
     sum->set_member(second->clone(), RIGHT);
     ((Pair *)sum->get_member(LEFT))->increment_depth();
     ((Pair *)sum->get_member(RIGHT))->increment_depth();
-    cout << "Addition " << sum->to_string() << endl;
+    //cout << "Addition " << sum->to_string() << endl;
     
     Pair * to_explode = sum->find_first_to_explode();
     Number * to_split = sum->find_first_to_split();
@@ -428,12 +428,12 @@ Pair * AocDay18::sum(Pair * first, Pair * second)
         if (to_explode != NULL)
         {
             explode(sum, to_explode);
-            cout << "Explode " << sum->to_string() << endl;
+            //cout << "Explode " << sum->to_string() << endl;
         }
         else
         {
             split(sum, to_split);
-            cout << "Split " << sum->to_string() << endl;
+            //cout << "Split " << sum->to_string() << endl;
         }
         to_explode = sum->find_first_to_explode();
         to_split = sum->find_first_to_split();
