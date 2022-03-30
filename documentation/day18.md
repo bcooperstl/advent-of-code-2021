@@ -136,6 +136,7 @@ A *pair* will have:
 - a *get_type* method, which returns PAIR
 - a *build_number_list* function that recursively builds a list of the Number values to be used for exploding
 - a *find_parent* function that recursively looks for the parent of a given node
+- a *find_first_to_explode* function that finds the first cell that should be exploded.
 
 ### Input parsing ###
 
