@@ -195,6 +195,23 @@ When this pair is found, store it in *target*. From there, we need to find the l
     - set *parent->right* to *zero*
 - delete *target*
 
+### Splitting a pair ###
+
+To identify a pair to split, do a depth-first search from *base* looking for a number where the value is larger than 9.
+If none is found, there are no pairs to split.
+
+When this pair, is found, store it in *target*. From there, we need to find the parent.
+- Create a new Pair, stored in *split_pair*
+- Create a new Number with value *target->value/2* and store it in *split_pair->left*
+- Create a new Number with value *(target->value+1)/2* and store it in *split_pair->right*. This takes care of the rounding it up if necessary. Thanks C++
+- Call the *find_parent_node* for target, storing result in *parent*
+- Set the *split_pair->depth* to *parent->depth + 1*
+- if *parent->left* is *target*
+    - set *parent->left* to *split_pair*
+- else
+    - set *parent->right* to *split_pair*
+- delete *target*
+
 ## Things I learned ##
 
 Doing this with test-driven development to make up all of the unique test cases for each portion.
