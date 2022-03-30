@@ -137,6 +137,7 @@ A *pair* will have:
 - a *build_number_list* function that recursively builds a list of the Number values to be used for exploding
 - a *find_parent* function that recursively looks for the parent of a given node
 - a *find_first_to_explode* function that finds the first cell that should be exploded.
+- an *increment_depth* function to recusrively increment the depth of all pairs
 
 ### Input parsing ###
 
@@ -211,6 +212,25 @@ When this pair, is found, store it in *target*. From there, we need to find the 
 - else
     - set *parent->right* to *split_pair*
 - delete *target*
+
+### Summing two pairs ###
+
+This will sum two pairs *first* and *second*, storing the result in *sum*.
+It will also handle the reducing by exploding and splitting.
+
+- Create a new pair *sum*
+- Set the *sum->depth* to 1
+- Clone *first* and store in *sum->left*
+- Clone *second* and store in *sum->right*
+- Call the increment_depth methods on both *sum->left* and *sum->right*
+- Set *to_explode* equal to *sum->find_first_to_explode* and *to_split* equal to *sum->find_first_to_split*
+- While *to_explode* or *to_split* is not equal to null
+    - if *to_explode* is not null
+        - call the *explode* fucntion on *sum* and *to_explode*
+    - else *to_split* must not be null
+        - call the *split* function on *sum* and *to_split*
+    - Set *to_explode* equal to *sum->find_first_to_explode* and *to_split* equal to *sum->find_first_to_split*
+- return *sum*
 
 ## Things I learned ##
 
