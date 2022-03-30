@@ -60,7 +60,7 @@ namespace Day18
             void build_number_list(vector<Number *> & numbers);
             Pair * find_parent(Node * target);
             Pair * find_first_to_explode();
-            void explode(Node * target);
+            Number * find_first_to_split();
     };
 }
 
@@ -72,6 +72,7 @@ class AocDay18 : public AocDay
         vector<Pair *> parse_input(string filename);
         Pair * convert_line(string input);
         void explode(Pair * base, Pair * target);
+        void split(Pair * base, Number * target);
         string run_test(string filename, string test);
     public:
         AocDay18();

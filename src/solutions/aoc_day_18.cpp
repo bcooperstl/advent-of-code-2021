@@ -189,6 +189,44 @@ namespace Day18
         
         return NULL;
     }
+
+    Number * Pair::find_first_to_split()
+    {
+        
+        if (m_members[LEFT]->get_type() == TYPE_PAIR)
+        {
+            Number * result = ((Pair *)m_members[LEFT])->find_first_to_split();
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        else // is number
+        {
+            if (((Number *)m_members[LEFT])->get_value() > 9)
+            {
+                return (Number *)m_members[LEFT];
+            }
+        }
+        
+        if (m_members[RIGHT]->get_type() == TYPE_PAIR)
+        {
+            Number * result = ((Pair *)m_members[RIGHT])->find_first_to_split();
+            if (result != NULL)
+            {
+                return result;
+            }
+        }
+        else // is number
+        {
+            if (((Number *)m_members[RIGHT])->get_value() > 9)
+            {
+                return (Number *)m_members[RIGHT];
+            }
+        }
+        
+        return NULL;
+    }
     
 };
 
@@ -313,6 +351,26 @@ void AocDay18::explode(Pair * base, Pair * target)
     delete target;
 }
 
+void AocDay18::split(Pair * base, Number * target)
+{
+    Pair * split_pair = new Pair();
+    split_pair->set_member(new Number(target->get_value()/2), LEFT);
+    split_pair->set_member(new Number((target->get_value()+1)/2), RIGHT);
+    
+    Pair * parent = base->find_parent(target);
+    split_pair->set_depth(parent->get_depth()+1);
+    
+    if (parent->get_member(LEFT) == target)
+    {
+        parent->set_member(split_pair, LEFT);
+    }
+    else
+    {
+        parent->set_member(split_pair, RIGHT);
+    }
+    delete target;
+}
+
 string AocDay18::run_test(string filename, string test)
 {
     if (test == "parse")
@@ -333,6 +391,21 @@ string AocDay18::run_test(string filename, string test)
             cerr << "No node found to explode for test" << endl;
         }
         explode(inputs[0], first_to_explode);
+        
+        string ret = inputs[0]->to_string();
+        delete inputs[0];
+        return ret;
+    }
+    if (test == "split")
+    {
+        vector<Pair *> inputs = parse_input(filename);
+        
+        Number * first_to_split = inputs[0]->find_first_to_split();
+        if (first_to_split == NULL)
+        {
+            cerr << "No node found to split for test" << endl;
+        }
+        split(inputs[0], first_to_split);
         
         string ret = inputs[0]->to_string();
         delete inputs[0];
