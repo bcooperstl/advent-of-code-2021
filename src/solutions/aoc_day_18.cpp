@@ -58,6 +58,11 @@ namespace Day18
         return clone;
     }
     
+    long Number::get_magnitude()
+    {
+        return (long) m_value;
+    }
+    
     Pair::Pair() 
     {
         m_members[LEFT] = NULL;
@@ -256,6 +261,11 @@ namespace Day18
         {
             ((Pair *)m_members[RIGHT])->increment_depth();
         }
+    }
+
+    long Pair::get_magnitude()
+    {
+        return (3l * m_members[LEFT]->get_magnitude()) + (2l * m_members[RIGHT]->get_magnitude());; // 3 and 2 are longs
     }
 };
 
@@ -493,7 +503,17 @@ string AocDay18::run_test(string filename, string test)
         
         return ret;
     }
+    if (test == "mag")
+    {
+        vector<Pair *> inputs = parse_input(filename);
         
+        long magnitude = inputs[0]->get_magnitude();
+        delete inputs[0];
+        ostringstream out;
+        out << magnitude;
+        return out.str();
+    }
+    
     return "";
 }
 

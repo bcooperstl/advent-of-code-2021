@@ -23,6 +23,7 @@ namespace Day18
             virtual string to_string() = 0;
             virtual Node * clone() = 0;
             virtual int get_type() = 0;
+            virtual long get_magnitude() = 0;
     };
     
     class Number : public Node
@@ -37,6 +38,7 @@ namespace Day18
             virtual string to_string();
             virtual Node * clone();
             virtual int get_type();
+            virtual long get_magnitude();
     };
     
     class Pair : public Node
@@ -62,6 +64,7 @@ namespace Day18
             Pair * find_first_to_explode();
             Number * find_first_to_split();
             void increment_depth();
+            virtual long get_magnitude();
     };
 }
 

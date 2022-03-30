@@ -121,12 +121,14 @@ A *node* will have:
 - a virtual *to_string* method, for dumping a node to a string.
 - a virtual *clone* method, for making a deep copy of a node
 - a virtual *get_type* method, for returning the node type
+- a virtual *get_magnitude* method, for returning the magnitude
 
 A *number* will have:
 - a *value* that corresponds to its numberical value.
 - a *to_string* method, which outputs the value
 - a *clone* method, which creates a new number
 - a *get_type* method, which returns NUMBER
+- a *get_magnitude* method, which returns the value as the magnitude
 
 A *pair* will have:
 - an array of two *members* to correspond to its left and right elements. These will be type *node \** because a pair can have pairs.
@@ -138,6 +140,7 @@ A *pair* will have:
 - a *find_parent* function that recursively looks for the parent of a given node
 - a *find_first_to_explode* function that finds the first cell that should be exploded.
 - an *increment_depth* function to recusrively increment the depth of all pairs
+- a *get_magnitude* method, which returns the calculated magnitude
 
 ### Input parsing ###
 
@@ -231,6 +234,10 @@ It will also handle the reducing by exploding and splitting.
         - call the *split* function on *sum* and *to_split*
     - Set *to_explode* equal to *sum->find_first_to_explode* and *to_split* equal to *sum->find_first_to_split*
 - return *sum*
+
+### Calculating the magnitude ###
+
+This is a simple recusrive function to calculate the magnitude with the formula *3 \* left + 2 \* right*.
 
 ## Things I learned ##
 
