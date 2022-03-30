@@ -31,6 +31,8 @@ From the final pair, we are to calculate its magnitude by the following:
 
 ## Part 2 Requirements ##
 
+From the list of pairs, find the largest magnitude that comes from adding two pairs. 
+
 ### Input Format ###
 
 The input will be a list of pairs, one per line.
@@ -43,6 +45,7 @@ Number - the magnitude of the sum of the pairs.
 
 #### Part 2 ####
 
+Number - the largest magnitude from adding any two of the pairs.
 
 ## Test Cases ##
 
@@ -248,6 +251,20 @@ This is a simple recusrive function to calculate the magnitude with the formula 
     - delete *running_sum*
     - set *running_sum* to *current*
 - **OUTPUT** the magnitude of *running_sum* and clean up memory
+
+### Main program for part 2 ###
+
+- Read in the input file in *inputs*
+- set *max_magnitude* to 0
+- Loop over the inputs with *first*
+    - Loop over the inputs with *second*
+        - if *first* is not equal to *second*
+            - Store *first* + *second* into *current*
+            - If *current->get_magnitude()* > *max_magnitude*
+                - set *max_magnitude* to *current->get_magnitude()*
+            - delete *current*
+- **OUTPUT** the *max_magnitude* value and clean up memory
+
 
 ## Things I learned ##
 

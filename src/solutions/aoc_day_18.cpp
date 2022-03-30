@@ -546,3 +546,37 @@ string AocDay18::part1(string filename, vector<string> extra_args)
     
     return out.str();
 }
+
+string AocDay18::part2(string filename, vector<string> extra_args)
+{
+    vector<Pair *> inputs = parse_input(filename);
+        
+    long max_magnitude = 0;
+    
+    for (int first=0; first<inputs.size(); first++)
+    {
+        for (int second=0; second<inputs.size(); second++)
+        {
+            if (first != second)
+            {
+                Pair * current = sum(inputs[first], inputs[second]);
+                long magnitude = current->get_magnitude();
+                if (magnitude > max_magnitude)
+                {
+                    max_magnitude = magnitude;
+                }
+                delete current;
+            }
+        }
+    }
+    
+    ostringstream out;
+    out << max_magnitude;
+    
+    for (int i=0; i<inputs.size(); i++)
+    {
+        delete inputs[i];
+    }
+    
+    return out.str();
+}
