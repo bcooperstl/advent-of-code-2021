@@ -118,16 +118,24 @@ There is one test case that does a [complete test](../data/test_cases/day18_test
 
 I will create a *node* base class, which can have two inherited classes: *pair* and *number*.
 A *node* will have:
--a virtual *to_string* method, for dumping a node to a string.
+- a virtual *to_string* method, for dumping a node to a string.
+- a virtual *clone* method, for making a deep copy of a node
+- a virtual *get_type* method, for returning the node type
 
 A *number* will have:
--a *value* that corresponds to its numberical value.
--a *to_string* method, 
+- a *value* that corresponds to its numberical value.
+- a *to_string* method, which outputs the value
+- a *clone* method, which creates a new number
+- a *get_type* method, which returns NUMBER
 
 A *pair* will have:
--an array of two *members* to correspond to its left and right elements. These will be type *node \** because a pair can have pairs.
--a *depth* value to correspond to the depth of each pair. also include getter and setter
--a *get_string* method that will return a string that corresponds to the 
+- an array of two *members* to correspond to its left and right elements. These will be type *node \** because a pair can have pairs.
+- a *depth* value to correspond to the depth of each pair. also include getter and setter
+- a *get_string* method that will return a string that corresponds to the 
+- a *clone* method, which creates a new pair, and then clones the left and right nodes of this pair to assign tot he new pair assigns the 
+- a *get_type* method, which returns PAIR
+- a *build_number_list* function that recursively builds a list of the Number values to be used for exploding
+- a *find_parent* function that recursively looks for the parent of a given node
 
 ### Input parsing ###
 
@@ -165,6 +173,26 @@ Note that by inspection, all input values are in the range 0-9.
         - decrement *current_depth*
     - increment position
 - return *base*
+
+### Exploding a pair ###
+
+To identify the pair to explode, do a depth-first search from *base*, looking for a pair where the depth is equal to 5.
+If none is found, there are no pairs to explode.
+
+When this pair is found, store it in *target*. From there, we need to find the literal values to the left and right of it, as well as the parent of it.
+- Call the *build_number_list* method on the *base* pair, storing the result in *numbers*
+- loop over *numbers* with *num*
+    - if *numbers[num]* == *target->left* and *num* > 0
+        - increment *numbers[num-1]* by *target->left*
+    - if *numbers[num*] == *target->right* and *num* < *length(numbers)-1*
+        - increment *numbers[num+1]* by *target->right*
+- Call the *find_parent_node* for target, storing result in *parent*
+- Create a new Number *zero* with value 0
+- if *parent->left* is *target*
+    - set *parent->left* to *zero*
+- else
+    - set *parent->right* to *zero*
+- delete *target*
 
 ## Things I learned ##
 
