@@ -236,7 +236,7 @@ string AocDay19::part1(string filename, vector<string> extra_args)
     vector<Scanner *> scanners = parse_input(filename); // these become owned by region
     
     region.set_scanners(scanners);
-    
+    region.set_scanner_zero_as_origin();
     
     ostringstream out;
     out << region.get_actual_beacons().size();
