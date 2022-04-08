@@ -70,6 +70,7 @@ There will be a Scanner class which will contain:
 There will be a Region class which will contain:
 - A list of Scanners
 - A list of ActualBeacons
+- A method to set Scanner 0 to center of region
 
 ### Input Parsing ###
 
@@ -83,6 +84,21 @@ There will be a Region class which will contain:
     - If the line is blank, skip it
 - Return the list of Scanners
     
+### Setting scanner 0 to center of region ###
+
+We will delcare that scanner 0 is at the origin and its beacons are relative to the origin.
+
+- on Scanner 0, set the actual location to be the same as observed, that is 0,0,0
+- for each of the scanner 0 observed beacons:
+    - create an absolute beacon with its same location
+    - add the observed beacon as one that corresponds to the actual beacon
+    - add this absolute beacon to the region
+
+### Main Loop ###
+- Parse the input file into a list of Scanners, and assign those to the Region
+
+- **Output** the size of the region's actual beacons list
+
 ## Things I learned ##
 
 
