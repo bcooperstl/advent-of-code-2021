@@ -94,6 +94,18 @@ We will delcare that scanner 0 is at the origin and its beacons are relative to 
     - add the observed beacon as one that corresponds to the actual beacon
     - add this absolute beacon to the region
 
+### Identifying overlapping regions between scanners ###
+
+The first step to identify overlapping regions is to find pairs of points with the same distances apart across 3 dimensions.
+
+The largest scanner has 27 beacons, which means 351 pairs of points.
+
+We will store the distances between points in two different ways. The first way is what I am calling a simple distance - bascially a formula.
+If we have pairs of beacons from different scanners with the same simple distance apart, we can then compare the actual distances in the x, y, and z, components.
+
+
+
+
 ### Main Loop ###
 - Parse the input file into a list of Scanners, and assign those to the Region
 

@@ -35,6 +35,48 @@ namespace Day19
         return m_owner;
     }
     
+    BeaconPairDistance::BeaconPairDistance(ObservedBeacon * first, ObservedBeacon * second)
+    {
+        m_beacons[0] = first;
+        m_beacons[1] = second;
+        calculate_simple_distance();
+    }
+    
+    BeaconPairDistance::~BeaconPairDistance()
+    {
+    }
+    
+    void BeaconPairDistance::calculate_simple_distance()
+    {
+        Coordinates first = m_beacons[0]->get_coordinates();
+        Coordinates second = m_beacons[1]->get_coordinates();
+        
+        m_simple_distance = ((first.x-second.x)*(first.x-second.x)) +
+                            ((first.y-second.y)*(first.y-second.y)) +
+                            ((first.z-second.z)*(first.z-second.z));
+    }
+    
+    int BeaconPairDistance::get_simple_distance()
+    {
+        return m_simple_distance;
+    }
+    
+    void BeaconPairDistance::get_actual_distance(int & x, int & y, int & z)
+    {
+        Coordinates first = m_beacons[0]->get_coordinates();
+        Coordinates second = m_beacons[1]->get_coordinates();
+        
+        x = first.x-second.x;
+        y = first.y-second.y;
+        z = first.z-second.z;
+    }
+    
+    void BeaconPairDistance::reverse()
+    {
+        ObservedBeacon * temp = m_beacons[1];
+        m_beacons[1] = m_beacons[0];
+        m_beacons[0] = temp;
+    }
     
     ActualBeacon::ActualBeacon(int x, int y, int z)
     {
@@ -121,6 +163,25 @@ namespace Day19
         return m_actual_determined;
     }
     
+    vector<BeaconPairDistance> Scanner::get_beacon_pair_distances()
+    {
+        vector<BeaconPairDistance> distances;
+        cout << "Calculating distances for scanner " << m_number << endl;
+        for (int i=0; i<m_beacons.size()-1; i++)
+        {
+            Coordinates first = m_beacons[i]->get_coordinates();
+            for (int j=i+1; j<m_beacons.size(); j++)
+            {
+                BeaconPairDistance distance(m_beacons[i], m_beacons[j]);
+                Coordinates second = m_beacons[j]->get_coordinates();
+                cout << " The distance between " << first.x << "," << first.y << "," << first.z << " and "
+                     << second.x << "," << second.y << "," << second.z << " is " << distance.get_simple_distance() << endl;
+                distances.push_back(distance);
+            }
+        }
+        return distances;
+    }
+    
     Region::Region()
     {
         m_num_scanners = 0;
@@ -146,6 +207,7 @@ namespace Day19
         {
             Scanner * current = scanners[i];
             m_scanners[current->get_number()]=current;
+            //cout << "Scanner " << i << " has " << current->get_beacons().size() << " beacons" << endl;
         }
         cout << "Added " << m_num_scanners << " scanners" << endl;
     }
@@ -181,6 +243,43 @@ namespace Day19
             add_actual_beacon(actual);
             cout << " Added beacon at " << coordinates.x << "," << coordinates.y << "," << coordinates.z << endl;
         }
+    }
+    
+    bool Region::not_all_determined()
+    {
+        for (int i=0; i<m_num_scanners; i++)
+        {
+            if (!m_scanners[i]->get_actual_determined())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    void Region::map_overlaps()
+    {
+        while (not_all_determined())
+        {
+            for (int det_pos=0; det_pos < m_num_scanners; det_pos++)
+            {
+                for (int undet_pos=0; undet_pos < m_num_scanners; undet_pos++)
+                {
+                    if (m_scanners[det_pos]->get_actual_determined() && !m_scanners[undet_pos]->get_actual_determined())
+                    {
+                        check_overlap(m_scanners[det_pos], m_scanners[undet_pos]);
+                    }
+                }
+            }
+            break; // for testing
+        }
+    }
+    
+    void Region::check_overlap(Scanner * mapped, Scanner * unmapped)
+    {
+        cout << "Checking for overlap between mapped scanner " << mapped->get_number() << " and unmapped scanner " << unmapped->get_number() << endl;
+        vector<BeaconPairDistance> mapped_distances = mapped->get_beacon_pair_distances();
+        vector<BeaconPairDistance> unmapped_distances = unmapped->get_beacon_pair_distances();
     }
 };
 
@@ -237,6 +336,7 @@ string AocDay19::part1(string filename, vector<string> extra_args)
     
     region.set_scanners(scanners);
     region.set_scanner_zero_as_origin();
+    region.map_overlaps();
     
     ostringstream out;
     out << region.get_actual_beacons().size();

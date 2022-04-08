@@ -31,6 +31,20 @@ namespace Day19
             Scanner * get_owner();
     };
     
+    class BeaconPairDistance
+    {
+        private:
+            ObservedBeacon * m_beacons[2];
+            int m_simple_distance;
+            void calculate_simple_distance();
+        public:
+            BeaconPairDistance(ObservedBeacon * first, ObservedBeacon * second);
+            ~BeaconPairDistance();
+            int get_simple_distance();
+            void get_actual_distance(int & x, int & y, int & z);
+            void reverse();
+    };
+    
     class ActualBeacon
     {
         private:
@@ -63,6 +77,7 @@ namespace Day19
             void set_actual_coordinates(Coordinates coordinates);
             Coordinates get_actual_coordinates();            
             bool get_actual_determined();
+            vector<BeaconPairDistance> get_beacon_pair_distances();
     };
     
     class Region
@@ -71,6 +86,8 @@ namespace Day19
             Scanner * m_scanners[MAX_SCANNERS];
             int m_num_scanners;
             vector<ActualBeacon *> m_actual_beacons;
+            bool not_all_determined();
+            void check_overlap(Scanner * first, Scanner * second);
         public:
             Region();
             ~Region();
@@ -79,6 +96,7 @@ namespace Day19
             vector<ActualBeacon *> get_actual_beacons();
             void add_actual_beacon(ActualBeacon * beacon);
             void set_scanner_zero_as_origin();
+            void map_overlaps();
     };
 }
 
