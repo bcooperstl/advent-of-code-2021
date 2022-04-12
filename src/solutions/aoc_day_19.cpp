@@ -264,7 +264,7 @@ namespace Day19
         
         // TODO: If speedup is needed, Cache These in Scanner object
         BeaconDistances actual_distances[MAX_SCANNERS][MAX_SCANNERS];
-        BeaconDistances ummapped_distances[MAX_SCANNERS][MAX_SCANNERS];
+        BeaconDistances unmapped_distances[MAX_SCANNERS][MAX_SCANNERS];
         
         Coordinates actual_coordinates[MAX_SCANNERS];
         for (int i=0; i<num_mapped_actual_beacons; i++)
@@ -295,12 +295,80 @@ namespace Day19
         {
             for (int j=0; j<num_unmapped_beacons; j++)
             {
-                ummapped_distances[i][j].delta_x = unmapped_coordinates[i].x-unmapped_coordinates[j].x;
-                ummapped_distances[i][j].delta_y = unmapped_coordinates[i].y-unmapped_coordinates[j].y;
-                ummapped_distances[i][j].delta_z = unmapped_coordinates[i].z-unmapped_coordinates[j].z;
-                ummapped_distances[i][j].computed_distance = COMPUTE_DISTANCE(unmapped_coordinates[i], unmapped_coordinates[j]);
+                unmapped_distances[i][j].delta_x = unmapped_coordinates[i].x-unmapped_coordinates[j].x;
+                unmapped_distances[i][j].delta_y = unmapped_coordinates[i].y-unmapped_coordinates[j].y;
+                unmapped_distances[i][j].delta_z = unmapped_coordinates[i].z-unmapped_coordinates[j].z;
+                unmapped_distances[i][j].computed_distance = COMPUTE_DISTANCE(unmapped_coordinates[i], unmapped_coordinates[j]);
                 cout << " The distance between " << unmapped_coordinates[i].x << "," << unmapped_coordinates[i].y << "," << unmapped_coordinates[i].z << " and "
-                                                 << unmapped_coordinates[j].x << "," << unmapped_coordinates[j].y << "," << unmapped_coordinates[j].z << " is " << ummapped_distances[i][j].computed_distance << endl;
+                                                 << unmapped_coordinates[j].x << "," << unmapped_coordinates[j].y << "," << unmapped_coordinates[j].z << " is " << unmapped_distances[i][j].computed_distance << endl;
+            }
+        }
+        
+        for (int i=0; i<num_mapped_actual_beacons; i++)
+        {
+            for (int j=0; j<num_mapped_actual_beacons; j++)
+            {
+                if (i==j) // skip if same actual beacon
+                {
+                    continue;
+                }
+                for (int k=0; k<num_unmapped_beacons; k++)
+                {
+                    for (int l=0; l<num_unmapped_beacons; l++)
+                    {
+                        if (k==l) // skip if same unmapped
+                        {
+                            continue;
+                        }
+                        if (actual_distances[i][j].computed_distance == unmapped_distances[k][l].computed_distance)
+                        {
+                            cout << " Distance match between mapped "
+                                 << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z << " and "
+                                 << actual_coordinates[j].x << "," << actual_coordinates[j].y << "," << actual_coordinates[j].z << "  is " 
+                                 << actual_distances[i][j].delta_x << "," << actual_distances[i][j].delta_y << "," << actual_distances[i][j].delta_z << " = " << actual_distances[i][j].computed_distance 
+                                 << endl << "  and unmapped "
+                                 << unmapped_coordinates[k].x << "," << unmapped_coordinates[k].y << "," << unmapped_coordinates[k].z << " and "
+                                 << unmapped_coordinates[l].x << "," << unmapped_coordinates[l].y << "," << unmapped_coordinates[l].z << " is "
+                                 << unmapped_distances[k][l].delta_x << "," << unmapped_distances[k][l].delta_y << "," << unmapped_distances[k][l].delta_z << " = " << unmapped_distances[k][l].computed_distance << endl;
+                            
+                            int actual_delta_x = abs(actual_distances[i][j].delta_x);
+                            int actual_delta_y = abs(actual_distances[i][j].delta_y);
+                            int actual_delta_z = abs(actual_distances[i][j].delta_z);
+                            int unmapped_delta_x = abs(unmapped_distances[k][l].delta_x);
+                            int unmapped_delta_y = abs(unmapped_distances[k][l].delta_y);
+                            int unmapped_delta_z = abs(unmapped_distances[k][l].delta_z);
+                            
+                            if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_z)
+                            {
+                                cout << "  Case 1: where x1==x2, y1==y2, z1==z2" << endl;
+                            }
+                            else if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_y)
+                            {
+                                cout << "  Case 2: where x1==x2, y1==z2, z1==y2" << endl;
+                            }
+                            else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_z)
+                            {
+                                cout << "  Case 3: where x1==y2, y1==x2, z1==z2" << endl;
+                            }
+                            else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_x)
+                            {
+                                cout << "  Case 4: where x1==y2, y1==z2, z1==x2" << endl;
+                            }
+                            else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_y)
+                            {
+                                cout << "  Case 5: where x1==z2, y1==x2, z1==y2" << endl;
+                            }
+                            else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_x)
+                            {
+                                cout << "  Case 6: where x1==z2, y1==y2, z1==x2" << endl;
+                            }
+                            else 
+                            {
+                                cout << "   INVALID MATCH" << endl;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
