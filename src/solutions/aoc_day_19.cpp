@@ -304,8 +304,10 @@ namespace Day19
             }
         }
         
+        int num_actual_over_threshold = 0;
         for (int i=0; i<num_mapped_actual_beacons; i++)
         {
+            int case_count_matched[6] = {0,0,0,0,0,0};
             for (int j=0; j<num_mapped_actual_beacons; j++)
             {
                 if (i==j) // skip if same actual beacon
@@ -338,39 +340,60 @@ namespace Day19
                             int unmapped_delta_y = abs(unmapped_distances[k][l].delta_y);
                             int unmapped_delta_z = abs(unmapped_distances[k][l].delta_z);
                             
+                            bool valid = true;
+                            
                             if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_z)
                             {
-                                cout << "  Case 1: where x1==x2, y1==y2, z1==z2" << endl;
+                                cout << "  Case 0: where x1==x2, y1==y2, z1==z2" << endl;
+                                case_count_matched[0]++;
                             }
                             else if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_y)
                             {
-                                cout << "  Case 2: where x1==x2, y1==z2, z1==y2" << endl;
+                                cout << "  Case 1: where x1==x2, y1==z2, z1==y2" << endl;
+                                case_count_matched[1]++;
                             }
                             else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_z)
                             {
-                                cout << "  Case 3: where x1==y2, y1==x2, z1==z2" << endl;
+                                cout << "  Case 2: where x1==y2, y1==x2, z1==z2" << endl;
+                                case_count_matched[2]++;
                             }
                             else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_x)
                             {
-                                cout << "  Case 4: where x1==y2, y1==z2, z1==x2" << endl;
+                                cout << "  Case 3: where x1==y2, y1==z2, z1==x2" << endl;
+                                case_count_matched[3]++;
                             }
                             else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_y)
                             {
-                                cout << "  Case 5: where x1==z2, y1==x2, z1==y2" << endl;
+                                cout << "  Case 4: where x1==z2, y1==x2, z1==y2" << endl;
+                                case_count_matched[4]++;
                             }
                             else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_x)
                             {
-                                cout << "  Case 6: where x1==z2, y1==y2, z1==x2" << endl;
+                                cout << "  Case 5: where x1==z2, y1==y2, z1==x2" << endl;
+                                case_count_matched[5]++;
                             }
                             else 
                             {
                                 cout << "   INVALID MATCH" << endl;
+                                valid = false;
+                            }
+                            if (valid)
+                            {
+                                count_matched++;
                             }
                         }
                     }
                 }
             }
+            count_matched/=2; // divide by 2 because we matched both directions in the unmapped bucks
+            cout << "** Actual Beacon " << i << " at " << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z
+                 << " has " << count_matched << " matching points " << endl;
+            if (count_matched >= 11) // the point has 11 or more matching points, so 12 total beacons
+            {
+                num_actual_over_threshold++;
+            }
         }
+        cout << "There were " << num_actual_over_threshold << " beacons that matched the threshold" << endl;
     }
 };
 
