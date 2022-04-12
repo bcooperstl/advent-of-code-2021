@@ -17,32 +17,30 @@ namespace Day19
         int z;
     };
     
+    struct BeaconDistances
+    {
+        int delta_x;
+        int delta_y;
+        int delta_z;
+        int computed_distance;
+    };
+    
     class Scanner;
+    class ActualBeacon;
     
     class ObservedBeacon
     {
         private:
             Coordinates m_coordinates;
             Scanner * m_owner;
+            ActualBeacon * m_actual_beacon;
         public:
             ObservedBeacon(int x, int y, int z, Scanner * owner);
             ~ObservedBeacon();
             Coordinates get_coordinates();
             Scanner * get_owner();
-    };
-    
-    class BeaconPairDistance
-    {
-        private:
-            ObservedBeacon * m_beacons[2];
-            int m_simple_distance;
-            void calculate_simple_distance();
-        public:
-            BeaconPairDistance(ObservedBeacon * first, ObservedBeacon * second);
-            ~BeaconPairDistance();
-            int get_simple_distance();
-            void get_actual_distance(int & x, int & y, int & z);
-            void reverse();
+            void set_actual_beacon(ActualBeacon * beacon);
+            ActualBeacon * get_actual_beacon();
     };
     
     class ActualBeacon
@@ -77,7 +75,6 @@ namespace Day19
             void set_actual_coordinates(Coordinates coordinates);
             Coordinates get_actual_coordinates();            
             bool get_actual_determined();
-            vector<BeaconPairDistance> get_beacon_pair_distances();
     };
     
     class Region
