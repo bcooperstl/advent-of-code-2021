@@ -305,6 +305,7 @@ namespace Day19
         }
         
         int num_actual_over_threshold = 0;
+        int case_of_match;
         for (int i=0; i<num_mapped_actual_beacons; i++)
         {
             int case_count_matched[6] = {0,0,0,0,0,0};
@@ -377,20 +378,19 @@ namespace Day19
                                 cout << "   INVALID MATCH" << endl;
                                 valid = false;
                             }
-                            if (valid)
-                            {
-                                count_matched++;
-                            }
                         }
                     }
                 }
             }
-            count_matched/=2; // divide by 2 because we matched both directions in the unmapped bucks
-            cout << "** Actual Beacon " << i << " at " << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z
-                 << " has " << count_matched << " matching points " << endl;
-            if (count_matched >= 11) // the point has 11 or more matching points, so 12 total beacons
+            for (int c=0; c<=5; c++)
             {
-                num_actual_over_threshold++;
+                case_count_matched[c]/=2; // divide by 2 because we matched both directions in the unmapped bucks
+                if (case_count_matched[c] >= 11) // the point has 11 or more matching points, so 12 total beacons
+                {
+                    cout << "** Actual Beacon " << i << " at " << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z
+                         << " with matching case " << c << " has " << case_count_matched[c] << " matching points " << endl;
+                    num_actual_over_threshold++;
+                }
             }
         }
         cout << "There were " << num_actual_over_threshold << " beacons that matched the threshold" << endl;
