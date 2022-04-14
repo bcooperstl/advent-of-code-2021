@@ -10,6 +10,10 @@
 
 namespace Day19
 {
+    class Scanner;
+    class ActualBeacon;
+    class ObservedBeacon;
+    
     struct Coordinates
     {
         int x;
@@ -25,8 +29,13 @@ namespace Day19
         int computed_distance;
     };
     
-    class Scanner;
-    class ActualBeacon;
+    struct MatchingBeaconDistances
+    {
+        ActualBeacon * actual_beacons[2];
+        ObservedBeacon * unmapped_beacons[2];
+        BeaconDistances actual_distances;
+        BeaconDistances unmapped_distances;
+    };
     
     class ObservedBeacon
     {

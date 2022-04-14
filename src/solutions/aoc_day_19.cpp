@@ -304,11 +304,11 @@ namespace Day19
             }
         }
         
+        int case_of_match = -1;
         int num_actual_over_threshold = 0;
-        int case_of_match;
+        vector<MatchingBeaconDistances> matching_distances[6]; // one for each of the 6 cases
         for (int i=0; i<num_mapped_actual_beacons; i++)
         {
-            int case_count_matched[6] = {0,0,0,0,0,0};
             for (int j=0; j<num_mapped_actual_beacons; j++)
             {
                 if (i==j) // skip if same actual beacon
@@ -343,35 +343,43 @@ namespace Day19
                             
                             bool valid = true;
                             
+                            MatchingBeaconDistances distances;
+                            distances.actual_beacons[0] = mapped_actual_beacons[i];
+                            distances.actual_beacons[1] = mapped_actual_beacons[j];
+                            distances.unmapped_beacons[0] = unmapped_beacons[k];
+                            distances.unmapped_beacons[1] = unmapped_beacons[l];
+                            distances.actual_distances = actual_distances[i][j];
+                            distances.unmapped_distances = unmapped_distances[k][l];
+                            
                             if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_z)
                             {
                                 cout << "  Case 0: where x1==x2, y1==y2, z1==z2" << endl;
-                                case_count_matched[0]++;
+                                matching_distances[0].push_back(distances);
                             }
                             else if (actual_delta_x == unmapped_delta_x && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_y)
                             {
                                 cout << "  Case 1: where x1==x2, y1==z2, z1==y2" << endl;
-                                case_count_matched[1]++;
+                                matching_distances[1].push_back(distances);
                             }
                             else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_z)
                             {
                                 cout << "  Case 2: where x1==y2, y1==x2, z1==z2" << endl;
-                                case_count_matched[2]++;
+                                matching_distances[2].push_back(distances);
                             }
                             else if (actual_delta_x == unmapped_delta_y && actual_delta_y == unmapped_delta_z && actual_delta_z == unmapped_delta_x)
                             {
                                 cout << "  Case 3: where x1==y2, y1==z2, z1==x2" << endl;
-                                case_count_matched[3]++;
+                                matching_distances[3].push_back(distances);
                             }
                             else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_x && actual_delta_z == unmapped_delta_y)
                             {
                                 cout << "  Case 4: where x1==z2, y1==x2, z1==y2" << endl;
-                                case_count_matched[4]++;
+                                matching_distances[4].push_back(distances);
                             }
                             else if (actual_delta_x == unmapped_delta_z && actual_delta_y == unmapped_delta_y && actual_delta_z == unmapped_delta_x)
                             {
                                 cout << "  Case 5: where x1==z2, y1==y2, z1==x2" << endl;
-                                case_count_matched[5]++;
+                                matching_distances[5].push_back(distances);
                             }
                             else 
                             {
@@ -384,16 +392,128 @@ namespace Day19
             }
             for (int c=0; c<=5; c++)
             {
-                case_count_matched[c]/=2; // divide by 2 because we matched both directions in the unmapped bucks
-                if (case_count_matched[c] >= 11) // the point has 11 or more matching points, so 12 total beacons
+                if (matching_distances[c].size() >= 264) // the case has 264 or more matches (12 * 11 * 2) - 12 first points, 11 second points, 2 directions
                 {
                     cout << "** Actual Beacon " << i << " at " << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z
-                         << " with matching case " << c << " has " << case_count_matched[c] << " matching points " << endl;
+                         << " with matching case " << c << " has " << matching_distances[c].size() << " matching points " << endl;
                     num_actual_over_threshold++;
+                    case_of_match = c;
                 }
             }
         }
-        cout << "There were " << num_actual_over_threshold << " beacons that matched the threshold" << endl;
+        
+        if (case_of_match == -1)
+        {
+            cout << "No overlap found between mapped scanner " << mapped->get_number() << " and unmapped scanner " << unmapped->get_number() << endl;
+            return;
+        }
+        
+        if (num_actual_over_threshold > 1)
+        {
+            cout << "***************************Multiple overlap cases found between mapped scanner " << mapped->get_number() << " and unmapped scanner " << unmapped->get_number() << endl;
+            return;
+        }
+        
+        // Need to find two matches with the same Actual and Unmapped Beacons in index 0, and different ones with different distance values
+        MatchingBeaconDistances matches_to_use[2];
+        MatchingBeaconDistances alternatives[2];
+        matches_to_use[0] = matching_distances[case_of_match][0];
+        
+        Coordinates temp_coord = matches_to_use[0].actual_beacons[0]->get_coordinates();
+        cout << " Using 1st match from actual " << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to ";
+        temp_coord = matches_to_use[0].actual_beacons[1]->get_coordinates();
+        cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " and unmapped ";
+        temp_coord = matches_to_use[0].unmapped_beacons[0]->get_coordinates();
+        cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to ";
+        temp_coord = matches_to_use[0].unmapped_beacons[1]->get_coordinates();
+        cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << endl;
+        
+        
+        // find a different segment from the same starting actual beacon
+        for (int i=0; i<matching_distances[case_of_match].size(); i++)
+        {
+            if ((matches_to_use[0].actual_beacons[0] == matching_distances[case_of_match][i].actual_beacons[0]) && // first actual beacon matches
+                (matches_to_use[0].actual_beacons[1] != matching_distances[case_of_match][i].actual_beacons[1]))
+            {
+                matches_to_use[1] = matching_distances[case_of_match][i];
+                temp_coord = matches_to_use[1].actual_beacons[0]->get_coordinates();
+                cout << " Using 2nd match from actual " << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to " ;
+                temp_coord = matches_to_use[1].actual_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " and unmapped ";
+                temp_coord = matches_to_use[1].unmapped_beacons[0]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to ";
+                temp_coord = matches_to_use[1].unmapped_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << endl;
+                break; // got one. done
+            }
+        }
+
+        // find the two alternate segments - same actual beacons, but reversed unmapped beacons
+        for (int i=0; i<matching_distances[case_of_match].size(); i++)
+        {
+            if ((matches_to_use[0].actual_beacons[0] == matching_distances[case_of_match][i].actual_beacons[0]) && // first actual beacon matches
+                (matches_to_use[0].actual_beacons[1] == matching_distances[case_of_match][i].actual_beacons[1]) &&
+                (matches_to_use[0].unmapped_beacons[0] == matching_distances[case_of_match][i].unmapped_beacons[1]) &&
+                (matches_to_use[0].unmapped_beacons[1] == matching_distances[case_of_match][i].unmapped_beacons[0]))
+            {
+                alternatives[0] = matching_distances[case_of_match][i];
+                temp_coord = alternatives[0].actual_beacons[0]->get_coordinates();
+                cout << " Setting 1st alternative from actual " << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to " ;
+                temp_coord = alternatives[0].actual_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " and unmapped ";
+                temp_coord = alternatives[0].unmapped_beacons[0]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to ";
+                temp_coord = alternatives[0].unmapped_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << endl;
+            }
+            
+            if ((matches_to_use[1].actual_beacons[0] == matching_distances[case_of_match][i].actual_beacons[0]) && // first actual beacon matches
+                (matches_to_use[1].actual_beacons[1] == matching_distances[case_of_match][i].actual_beacons[1]) &&
+                (matches_to_use[1].unmapped_beacons[0] == matching_distances[case_of_match][i].unmapped_beacons[1]) &&
+                (matches_to_use[1].unmapped_beacons[1] == matching_distances[case_of_match][i].unmapped_beacons[0]))
+            {
+                alternatives[1] = matching_distances[case_of_match][i];
+                temp_coord = alternatives[1].actual_beacons[0]->get_coordinates();
+                cout << " Setting 2nd alternative from actual " << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to " ;
+                temp_coord = alternatives[1].actual_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " and unmapped ";
+                temp_coord = alternatives[1].unmapped_beacons[0]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << " to ";
+                temp_coord = alternatives[1].unmapped_beacons[1]->get_coordinates();
+                cout << temp_coord.x << "," << temp_coord.y << "," << temp_coord.z << endl;
+            }
+        }
+        
+        if (matches_to_use[0].unmapped_beacons[0] == matches_to_use[1].unmapped_beacons[0])
+        {
+            cout << " Matches are already good. No need to deal with alternatives" << endl;
+        }
+        else if (matches_to_use[0].unmapped_beacons[0] == alternatives[1].unmapped_beacons[0])
+        {
+            cout << " Using alternative for second match " << endl;
+            matches_to_use[1] = alternatives[1];
+        }
+        else if (matches_to_use[1].unmapped_beacons[0] == alternatives[0].unmapped_beacons[0])
+        {
+            cout << " Using alternative for first match " << endl;
+            matches_to_use[0] = alternatives[0];
+        }
+        else if (alternatives[0].unmapped_beacons[0] == alternatives[0].unmapped_beacons[0])
+        {
+            cout << " Using alternatives for first and second matches " << endl;
+            matches_to_use[0] = alternatives[0];
+            matches_to_use[1] = alternatives[1];
+        }
+        else
+        {
+            cout << "*************FAILED alternative swapping sanity check" << endl;
+        }
+        
+        if (matches_to_use[0].unmapped_beacons[0] != matches_to_use[1].unmapped_beacons[0])
+        {
+            cout << "*************FAILED post-alternative-swap sanity check" << endl;
+        }
+    
     }
 };
 
