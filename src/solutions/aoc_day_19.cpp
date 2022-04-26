@@ -430,10 +430,14 @@ namespace Day19
         
         
         // find a different segment from the same starting actual beacon
+        // need to have different deltas as well
         for (int i=0; i<matching_distances[case_of_match].size(); i++)
         {
             if ((matches_to_use[0].actual_beacons[0] == matching_distances[case_of_match][i].actual_beacons[0]) && // first actual beacon matches
-                (matches_to_use[0].actual_beacons[1] != matching_distances[case_of_match][i].actual_beacons[1]))
+                (matches_to_use[0].actual_beacons[1] != matching_distances[case_of_match][i].actual_beacons[1]) &&
+                (abs(matches_to_use[0].actual_distances.delta_x) != abs(matching_distances[case_of_match][i].unmapped_distances.delta_x)) &&
+                (abs(matches_to_use[0].actual_distances.delta_y) != abs(matching_distances[case_of_match][i].unmapped_distances.delta_y)) &&
+                (abs(matches_to_use[0].actual_distances.delta_z) != abs(matching_distances[case_of_match][i].unmapped_distances.delta_z)) )
             {
                 matches_to_use[1] = matching_distances[case_of_match][i];
                 temp_coord = matches_to_use[1].actual_beacons[0]->get_coordinates();
@@ -514,6 +518,225 @@ namespace Day19
             cout << "*************FAILED post-alternative-swap sanity check" << endl;
         }
     
+        MappedToActualTransformations transforms;
+        for (int i=0; i<3; i++)
+        {
+            transforms.x_mult[i] = 0;
+            transforms.y_mult[i] = 0;
+            transforms.z_mult[i] = 0;
+            transforms.offset[i] = 0;
+        }
+        
+        // case 0: x1 = x2, y1 = y2, z1 = z2
+        if (case_of_match == 0)
+        {
+            // unmapped X goes to actual X
+            determine_transform(transforms.x_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+            // unmapped Y goes to actual Y
+            determine_transform(transforms.y_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+            // unmapped Z goes to actual Z
+            determine_transform(transforms.z_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+        }    
+        // case 1: x1 = x2, y1 = z2, z1 = y2
+        if (case_of_match == 1)
+        {
+            // unmapped X goes to actual X
+            determine_transform(transforms.x_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+            // unmapped Z goes to actual Y
+            determine_transform(transforms.z_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+            // unmapped Y goes to actual Z
+            determine_transform(transforms.y_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+        }    
+        // case 2: x1 = y2, y1 = x2, z1 = z2
+        if (case_of_match == 2)
+        {
+            // unmapped Y goes to actual X
+            determine_transform(transforms.y_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+            // unmapped X goes to actual Y
+            determine_transform(transforms.x_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+            // unmapped Z goes to actual Z
+            determine_transform(transforms.z_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+        }    
+        // case 3: x1 = y2, y1 = z2, z1 = x2
+        if (case_of_match == 3)
+        {
+            // unmapped Y goes to actual X
+            determine_transform(transforms.y_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+            // unmapped Z goes to actual Y
+            determine_transform(transforms.z_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+            // unmapped X goes to actual Z
+            determine_transform(transforms.x_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+        }    
+        // case 4: x1 = z2, y1 = x2, z1 = y2
+        if (case_of_match == 4)
+        {
+            // unmapped Z goes to actual X
+            determine_transform(transforms.z_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+            // unmapped X goes to actual Y
+            determine_transform(transforms.x_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+            // unmapped Y goes to actual Z
+            determine_transform(transforms.y_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+        }    
+        // case 5: x1 = z2, y1 = y2, z1 = x2
+        if (case_of_match == 5)
+        {
+            // unmapped Z goes to actual X
+            determine_transform(transforms.z_mult[X_INDEX], transforms.offset[X_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().z);
+            // unmapped Y goes to actual Y
+            determine_transform(transforms.y_mult[Y_INDEX], transforms.offset[Y_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().y, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().y, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().y);
+            // unmapped X goes to actual Z
+            determine_transform(transforms.x_mult[Z_INDEX], transforms.offset[Z_INDEX], 
+                                matches_to_use[0].actual_beacons[0]->get_coordinates().z, 
+                                matches_to_use[0].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[1].actual_beacons[1]->get_coordinates().z, 
+                                matches_to_use[0].unmapped_beacons[0]->get_coordinates().x, 
+                                matches_to_use[0].unmapped_beacons[1]->get_coordinates().x, 
+                                matches_to_use[1].unmapped_beacons[1]->get_coordinates().x);
+        }
+        
+        cout << " The final transformation matrix is :" << endl;
+        cout << "  X = " << transforms.x_mult[X_INDEX] << "*x + " << transforms.y_mult[X_INDEX] << "*y + " << transforms.z_mult[X_INDEX] << "*z + " << transforms.offset[X_INDEX] << endl;
+        cout << "  Y = " << transforms.x_mult[Y_INDEX] << "*x + " << transforms.y_mult[Y_INDEX] << "*y + " << transforms.z_mult[Y_INDEX] << "*z + " << transforms.offset[Y_INDEX] << endl;
+        cout << "  Z = " << transforms.x_mult[Z_INDEX] << "*x + " << transforms.y_mult[Z_INDEX] << "*y + " << transforms.z_mult[Z_INDEX] << "*z + " << transforms.offset[Z_INDEX] << endl;
+    }
+    
+    void Region::determine_transform(int & mult, int & offset, int actual_common, int actual_one, int actual_two, int unmapped_common, int unmapped_one, int unmapped_two)
+    {
+        cout << "Determining transform from actual " << actual_common << " " << actual_one << " " << actual_two << " and unmapped " << unmapped_common << " " << unmapped_one << " " << unmapped_two << endl;
+        int actual_difference_one = actual_common - actual_one;
+        int unmapped_difference_one = unmapped_common - unmapped_one;
+        cout << " actual difference one = " << actual_difference_one << endl;
+        cout << " unmapped difference one = " << unmapped_difference_one << endl;
+        if (actual_difference_one == unmapped_difference_one)
+        {
+            cout << " The differences are the same. Multiplier is 1" << endl;
+            mult = 1;
+        }
+        else if (actual_difference_one == -1 * unmapped_difference_one)
+        {
+            cout << " The differences are opposites. Multiplier is -1" << endl;
+            mult = -1;
+        }
+        else
+        {
+            cout << "************************ Something ain't right with the differences" << endl;
+            mult = 0;
+        }
+        offset = actual_common - (mult * unmapped_common);
+        cout << " The offset is " << offset << endl;
+        
+        // double-check our work
+        int calc_common = unmapped_common * mult + offset;
+        int calc_one = unmapped_one * mult + offset;
+        int calc_two = unmapped_two * mult + offset;
+        cout << " Calculated values are " << calc_common << " " << calc_one << " " << calc_two << endl;
+        if (calc_common != actual_common || calc_one != actual_one || calc_two != actual_two)
+        {
+            cout << "*************************** Error in calculations!!!" << endl;
+        }
+        return;
     }
 };
 

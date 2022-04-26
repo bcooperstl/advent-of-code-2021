@@ -37,6 +37,19 @@ namespace Day19
         BeaconDistances unmapped_distances;
     };
     
+#define X_INDEX 0
+#define Y_INDEX 1
+#define Z_INDEX 2
+    // adj_value = x_mult * x + y_mult * y + z_mult * z + offset
+    struct MappedToActualTransformations
+    {
+        // there are three of everything which are used to compute the final values for x, y, and z
+        int x_mult[3];
+        int y_mult[3];
+        int z_mult[3];
+        int offset[3];
+    };
+    
     class ObservedBeacon
     {
         private:
@@ -94,6 +107,7 @@ namespace Day19
             vector<ActualBeacon *> m_actual_beacons;
             bool not_all_determined();
             void check_overlap(Scanner * first, Scanner * second);
+            void determine_transform(int & mult, int & offset, int actual_common, int actual_one, int actual_two, int unmapped_common, int unmapped_one, int unmapped_two);
         public:
             Region();
             ~Region();
@@ -103,6 +117,7 @@ namespace Day19
             void add_actual_beacon(ActualBeacon * beacon);
             void set_scanner_zero_as_origin();
             void map_overlaps();
+            
     };
 }
 
