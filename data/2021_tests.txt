@@ -126,3 +126,8 @@
 18,1,day18_input.txt,4641
 18,2,test_cases/day18_test1.txt,3993
 18,2,day18_input.txt,4624
+19,1,test_cases/day19_test1.txt,79
+19,1,test_cases/day19_test2.txt,38
+19,1,day19_input.txt,390
+19,2,test_cases/day19_test1.txt,3621
+19,2,day19_input.txt,13327
