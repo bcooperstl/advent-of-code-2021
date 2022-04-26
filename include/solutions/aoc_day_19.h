@@ -106,7 +106,7 @@ namespace Day19
             int m_num_scanners;
             vector<ActualBeacon *> m_actual_beacons;
             bool not_all_determined();
-            void check_overlap(Scanner * first, Scanner * second);
+            void check_overlap(Scanner * mapped, Scanner * unmapped);
             void determine_transform(int & mult, int & offset, int actual_common, int actual_one, int actual_two, int unmapped_common, int unmapped_one, int unmapped_two);
         public:
             Region();

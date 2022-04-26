@@ -700,6 +700,51 @@ namespace Day19
         cout << "  X = " << transforms.x_mult[X_INDEX] << "*x + " << transforms.y_mult[X_INDEX] << "*y + " << transforms.z_mult[X_INDEX] << "*z + " << transforms.offset[X_INDEX] << endl;
         cout << "  Y = " << transforms.x_mult[Y_INDEX] << "*x + " << transforms.y_mult[Y_INDEX] << "*y + " << transforms.z_mult[Y_INDEX] << "*z + " << transforms.offset[Y_INDEX] << endl;
         cout << "  Z = " << transforms.x_mult[Z_INDEX] << "*x + " << transforms.y_mult[Z_INDEX] << "*y + " << transforms.z_mult[Z_INDEX] << "*z + " << transforms.offset[Z_INDEX] << endl;
+        
+        // First, we can set the scanner's coordinates at the offsets
+        Coordinates coord;
+        coord.x = transforms.offset[X_INDEX];
+        coord.y = transforms.offset[Y_INDEX];
+        coord.z = transforms.offset[Z_INDEX];
+        cout << " Scanner " << unmapped->get_number() << " is located at " << coord.x << "," << coord.y << "," << coord.z << endl;
+        unmapped->set_actual_coordinates(coord);
+        
+        for (int i=0; i<num_unmapped_beacons; i++)
+        {
+            coord.x = transforms.x_mult[X_INDEX]*unmapped_coordinates[i].x + 
+                      transforms.y_mult[X_INDEX]*unmapped_coordinates[i].y +
+                      transforms.z_mult[X_INDEX]*unmapped_coordinates[i].z +
+                      transforms.offset[X_INDEX];
+            coord.y = transforms.x_mult[Y_INDEX]*unmapped_coordinates[i].x + 
+                      transforms.y_mult[Y_INDEX]*unmapped_coordinates[i].y +
+                      transforms.z_mult[Y_INDEX]*unmapped_coordinates[i].z +
+                      transforms.offset[Y_INDEX];
+            coord.z = transforms.x_mult[Z_INDEX]*unmapped_coordinates[i].x + 
+                      transforms.y_mult[Z_INDEX]*unmapped_coordinates[i].y +
+                      transforms.z_mult[Z_INDEX]*unmapped_coordinates[i].z +
+                      transforms.offset[Z_INDEX];
+            cout << " Unmapped Beacon " << unmapped_coordinates[i].x << "," << unmapped_coordinates[i].y << "," << unmapped_coordinates[i].z
+                 << " is located at " << coord.x << "," << coord.y << "," << coord.z << endl;
+            ActualBeacon * matching_actual = NULL;
+            for (int j=0; j<m_actual_beacons.size(); j++)
+            {
+                Coordinates actual_coord = m_actual_beacons[j]->get_coordinates();
+                if (coord.x == actual_coord.x && coord.y == actual_coord.y && coord.z == actual_coord.z)
+                {
+                    cout << "  Match found with existing actual beacon" << endl;
+                    matching_actual = m_actual_beacons[j];
+                    break;
+                }
+            }
+            if (matching_actual == NULL)
+            {
+                cout << "  Need to create new actual beacon " << endl;
+                matching_actual = new ActualBeacon(coord);
+                add_actual_beacon(matching_actual);
+            }
+            unmapped_beacons[i]->set_actual_beacon(matching_actual);
+            matching_actual->add_corresponding_beacon(unmapped_beacons[i]);
+        }
     }
     
     void Region::determine_transform(int & mult, int & offset, int actual_common, int actual_one, int actual_two, int unmapped_common, int unmapped_one, int unmapped_two)
