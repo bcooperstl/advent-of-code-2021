@@ -131,7 +131,7 @@ class AocDay19 : public AocDay
         AocDay19();
         ~AocDay19();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif

@@ -858,3 +858,34 @@ string AocDay19::part1(string filename, vector<string> extra_args)
     out << region.get_actual_beacons().size();
     return out.str();
 }
+
+string AocDay19::part2(string filename, vector<string> extra_args)
+{
+    Region region;
+    vector<Scanner *> scanners = parse_input(filename); // these become owned by region
+    
+    region.set_scanners(scanners);
+    region.set_scanner_zero_as_origin();
+    region.map_overlaps();
+    
+    int max_distance = 0;
+    
+    for (int i=0; i<scanners.size()-1; i++)
+    {
+        Coordinates i_coord = scanners[i]->get_actual_coordinates();
+        for (int j=i+1; j<scanners.size(); j++)
+        {
+            Coordinates j_coord = scanners[j]->get_actual_coordinates();
+            int distance = abs(i_coord.x - j_coord.x) + abs(i_coord.y - j_coord.y) + abs(i_coord.z - j_coord.z);
+            cout << "The distance between scanners " << scanners[i]->get_number() << " and " << scanners[j]->get_number() << " is " << distance << endl;
+            if (distance > max_distance)
+            {
+                max_distance = distance;
+            }
+        }
+    }
+    
+    ostringstream out;
+    out << max_distance;
+    return out.str();
+}
