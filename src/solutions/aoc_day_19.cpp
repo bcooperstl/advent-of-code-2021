@@ -221,6 +221,7 @@ namespace Day19
     
     void Region::map_overlaps()
     {
+        int prior_num_determined = 1;
         while (not_all_determined())
         {
             for (int det_pos=0; det_pos < m_num_scanners; det_pos++)
@@ -233,7 +234,20 @@ namespace Day19
                     }
                 }
             }
-            break; // for testing
+            int num_determined = 0;
+            for (int i=0; i<m_num_scanners; i++)
+            {
+                if (m_scanners[i]->get_actual_determined())
+                {
+                    num_determined++;
+                }
+            }
+            if (prior_num_determined == num_determined)
+            {
+                cout << " DID NOTHING ON LAST LOOP" << endl;
+                break;
+            }
+            prior_num_determined = num_determined;
         }
     }
     
@@ -390,18 +404,17 @@ namespace Day19
                     }
                 }
             }
-            for (int c=0; c<=5; c++)
-            {
-                if (matching_distances[c].size() >= 264) // the case has 264 or more matches (12 * 11 * 2) - 12 first points, 11 second points, 2 directions
-                {
-                    cout << "** Actual Beacon " << i << " at " << actual_coordinates[i].x << "," << actual_coordinates[i].y << "," << actual_coordinates[i].z
-                         << " with matching case " << c << " has " << matching_distances[c].size() << " matching points " << endl;
-                    num_actual_over_threshold++;
-                    case_of_match = c;
-                }
-            }
         }
         
+        for (int c=0; c<=5; c++)
+        {
+            if (matching_distances[c].size() >= 264) // the case has 264 or more matches (12 * 11 * 2) - 12 first points, 11 second points, 2 directions
+            {
+                cout << "Matching case " << c << " has " << matching_distances[c].size() << " matching points " << endl;
+                num_actual_over_threshold++;
+                case_of_match = c;
+            }
+        }
         if (case_of_match == -1)
         {
             cout << "No overlap found between mapped scanner " << mapped->get_number() << " and unmapped scanner " << unmapped->get_number() << endl;
