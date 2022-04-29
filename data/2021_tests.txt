@@ -131,3 +131,4 @@
 19,1,day19_input.txt,390
 19,2,test_cases/day19_test1.txt,3621
 19,2,day19_input.txt,13327
+20,1,test_cases/day20_test1.txt,35
