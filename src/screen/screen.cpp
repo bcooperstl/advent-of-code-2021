@@ -21,12 +21,12 @@ Screen::Screen(char start_char, int min_x, int max_x, int min_y, int max_y)
     m_width = m_max_x - m_min_x + 1; // Need to the add the +1 for the 0 column
     m_height = m_max_y - m_min_y + 1; // Need to the add the +1 for the 0 row
     m_textmap = NULL;
-    allocate_textmap();
+    allocate_textmap(&m_textmap, m_height, m_width);
 }
 
 Screen::~Screen()
 {
-    deallocate_textmap();
+    deallocate_textmap(&m_textmap, m_height);
 }
 
 Screen::Screen(const Screen & other)
@@ -39,7 +39,7 @@ Screen::Screen(const Screen & other)
     m_width = other.m_width;
     m_height = other.m_height;
     m_textmap = NULL;
-    allocate_textmap();
+    allocate_textmap(&m_textmap, m_height, m_width);
     for (int y=0; y<m_height; y++)
     {
         for (int x=0; x<m_width; x++)
@@ -51,7 +51,7 @@ Screen::Screen(const Screen & other)
 
 Screen & Screen::operator =(const Screen & other)
 {
-    deallocate_textmap();
+    deallocate_textmap(&m_textmap, m_height);
     m_start_char = other.m_start_char;
     m_min_x = other.m_min_x;
     m_max_x = other.m_max_x;
@@ -59,7 +59,7 @@ Screen & Screen::operator =(const Screen & other)
     m_max_y = other.m_max_y;
     m_width = other.m_width;
     m_height = other.m_height;
-    allocate_textmap();
+    allocate_textmap(&m_textmap, m_height, m_width);
     for (int y=0; y<m_height; y++)
     {
         for (int x=0; x<m_width; x++)
@@ -70,27 +70,26 @@ Screen & Screen::operator =(const Screen & other)
     return *this;
 }
 
-void Screen::allocate_textmap()
+void Screen::allocate_textmap(char *** textmap, int height, int width)
 {
-    m_textmap = new char *[m_height];
-    for (int y=0; y<m_height; y++)
+    *textmap = new char *[height];
+    for (int y=0; y<height; y++)
     {
-        m_textmap[y] = new char[m_width];
-        for (int x=0; x<m_width; x++)
+        (*textmap)[y] = new char[width];
+        for (int x=0; x<width; x++)
         {
-            m_textmap[y][x]=m_start_char;
+            (*textmap)[y][x]=m_start_char;
         }
     }
 }
 
-void Screen::deallocate_textmap()
+void Screen::deallocate_textmap(char *** textmap, int height)
 {
-    for (int y=0; y<m_height; y++)
+    for (int y=0; y<height; y++)
     {
-        delete [] m_textmap[y];
+        delete [] (*textmap)[y];
     }
-    delete [] m_textmap;
-    m_textmap = NULL;
+    delete [] (*textmap);
 }
 
 int Screen::get_min_x()
@@ -125,17 +124,22 @@ int Screen::get_height()
 
 void Screen::load(vector<string> lines)
 {
-    deallocate_textmap();
+    load(lines, 0, 0);
+}    
+
+void Screen::load(vector<string> lines, int min_x, int min_y)
+{
+    deallocate_textmap(&m_textmap, m_height);
     
-    m_min_y = 0;
-    m_max_y = lines.size() - 1;
-    m_height = m_max_y + 1;
+    m_min_y = min_y;
+    m_max_y = min_y + lines.size() - 1;
+    m_height = lines.size();
     
-    m_min_x = 0;
-    m_max_x = lines[0].size() - 1;
-    m_width = m_max_x + 1;
+    m_min_x = min_x;
+    m_max_x = min_x + lines[0].size() - 1;
+    m_width = lines[0].size();
     
-    allocate_textmap();
+    allocate_textmap(&m_textmap, m_height, m_width);
     for (int y=0; y<m_height; y++)
     {
         string line = lines[y];
@@ -144,7 +148,7 @@ void Screen::load(vector<string> lines)
             m_textmap[y][x]=line[x];
         }
     }
-}    
+}
 
 // Starting this by dumping to cout. Later might change to pass in an ostream
 void Screen::display()
@@ -329,4 +333,41 @@ int Screen::num_matching_neighbors(int x, int y, char target, bool include_diago
         }
     }
     return count;
+}
+
+void Screen::expand(char expand_char)
+{
+    char ** old_textmap = m_textmap;
+    
+    char ** new_textmap = NULL;
+    allocate_textmap(&new_textmap, m_height+2, m_width+2);
+    
+    // copy the existing data first and add expand_chars to first and last column
+    for (int y=0; y<m_height; y++)
+    {
+        for (int x=0; x<m_width; x++)
+        {
+            new_textmap[y+1][x+1]=old_textmap[y][x];
+        }
+        new_textmap[y+1][0] = expand_char;
+        new_textmap[y+1][m_width+1] = expand_char;
+    }
+    
+    // add expand char to top and bottom rows
+    for (int x=0; x<m_width+2; x++)
+    {
+        new_textmap[0][x] = expand_char;
+        new_textmap[m_height+1][x] = expand_char;
+    }
+    
+    
+    deallocate_textmap(&old_textmap, m_height);
+    
+    m_textmap = new_textmap;
+    m_height+=2;
+    m_min_y--;
+    m_max_y++;
+    m_width+=2;
+    m_min_x--;
+    m_max_x++;
 }
