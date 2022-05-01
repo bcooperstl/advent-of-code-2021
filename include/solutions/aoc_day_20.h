@@ -15,7 +15,7 @@ class AocDay20 : public AocDay
 {
     private:
         void parse_input(string filename, char * enhancement_algorithm, Screen & image);
-        void process_enhancement(char * enhancement_algorithm, Screen & image);
+        void process_enhancement(char * enhancement_algorithm, Screen & image, char & infinity_color);
     public:
         AocDay20();
         ~AocDay20();

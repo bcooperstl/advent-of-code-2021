@@ -12,6 +12,9 @@
 
 #define ALGORITHM_LENGTH 512
 
+#define INDEX_INFINITY_DARK 0
+#define INDEX_INFINITY_LIGHT 511
+
 using namespace std;
 
 AocDay20::AocDay20():AocDay(20)
@@ -45,7 +48,7 @@ void AocDay20::parse_input(string filename, char * enhancement_algorithm, Screen
     return;
 }
 
-void AocDay20::process_enhancement(char * enhancement_algorithm, Screen & image)
+void AocDay20::process_enhancement(char * enhancement_algorithm, Screen & image, char & infinity_color)
 {
     int init_height = image.get_height();
     int init_width = image.get_width();
@@ -65,8 +68,7 @@ void AocDay20::process_enhancement(char * enhancement_algorithm, Screen & image)
         }
     }
     
-    image.expand(PIXEL_DARK);
-    image.display();
+    image.expand(infinity_color);
     cout << endl;
     for (int y=init_min_y; y<=init_max_y; y++)
     {
@@ -137,6 +139,35 @@ void AocDay20::process_enhancement(char * enhancement_algorithm, Screen & image)
         }
     }
     
+    if (infinity_color == PIXEL_LIGHT)
+    {
+        infinity_color = enhancement_algorithm[INDEX_INFINITY_LIGHT];
+    }
+    else // infinity_color == PIXEL_DARK
+    {
+        infinity_color = enhancement_algorithm[INDEX_INFINITY_DARK];
+    }
+    
+    // now need to set the expanded border to the new infinity color
+    int expand_min_x = image.get_min_x();
+    int expand_max_x = image.get_max_x();
+    int expand_min_y = image.get_min_y();
+    int expand_max_y = image.get_max_y();
+    
+    // set the top and the bottom rows
+    for (int x=expand_min_x; x<=expand_max_x; x++)
+    {
+        image.set(x,expand_min_y,infinity_color);
+        image.set(x,expand_max_y,infinity_color);
+    }
+    
+    // set the left and the right
+    for (int y=expand_min_y+1; y<=expand_max_y-1; y++) // can skip the top and bottom rows - already set
+    {
+        image.set(expand_min_x,y,infinity_color);
+        image.set(expand_max_x,y,infinity_color);
+    }
+    
     for (int j=0; j<init_height; j++)
     {
         delete [] algorithm_index[j];
@@ -148,6 +179,7 @@ string AocDay20::part1(string filename, vector<string> extra_args)
 {
     char enhancement_algorithm[ALGORITHM_LENGTH+1];
     Screen image;
+    char infinity_color = PIXEL_DARK;
     
     parse_input(filename, enhancement_algorithm, image);
     
@@ -155,13 +187,15 @@ string AocDay20::part1(string filename, vector<string> extra_args)
          << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
     
     image.display();
+    
     cout << "After expansion, image has height " << image.get_height() << " from " << image.get_min_y() << " to " << image.get_max_y()
          << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
     
+    image.expand(infinity_color);
     
     for (int i=0; i<2; i++)
     {
-        process_enhancement(enhancement_algorithm, image);
+        process_enhancement(enhancement_algorithm, image, infinity_color);
         image.display();
         cout << "After round " << i+1 << ", image has height " << image.get_height() << " from " << image.get_min_y() << " to " << image.get_max_y()
             << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
