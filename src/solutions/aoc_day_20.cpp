@@ -205,3 +205,34 @@ string AocDay20::part1(string filename, vector<string> extra_args)
     out << image.num_matching(PIXEL_LIGHT);
     return out.str();
 }
+
+string AocDay20::part2(string filename, vector<string> extra_args)
+{
+    char enhancement_algorithm[ALGORITHM_LENGTH+1];
+    Screen image;
+    char infinity_color = PIXEL_DARK;
+    
+    parse_input(filename, enhancement_algorithm, image);
+    
+    cout << "Before expansion, image has height " << image.get_height() << " from " << image.get_min_y() << " to " << image.get_max_y()
+         << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
+    
+    image.display();
+    
+    cout << "After expansion, image has height " << image.get_height() << " from " << image.get_min_y() << " to " << image.get_max_y()
+         << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
+    
+    image.expand(infinity_color);
+    
+    for (int i=0; i<50; i++)
+    {
+        process_enhancement(enhancement_algorithm, image, infinity_color);
+        image.display();
+        cout << "After round " << i+1 << ", image has height " << image.get_height() << " from " << image.get_min_y() << " to " << image.get_max_y()
+            << " and width " << image.get_width() << " from " << image.get_min_x() << " to " << image.get_max_x() << endl;
+    }
+    
+    ostringstream out;
+    out << image.num_matching(PIXEL_LIGHT);
+    return out.str();
+}
