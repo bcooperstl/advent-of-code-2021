@@ -53,7 +53,15 @@ namespace Day21
             int play_to_winner(int winning_score); // returns the player number (1 or 2) of the winner
             int get_score(int player_number);
     };
-            
+    
+    
+    struct Universe
+    {
+        int position[3];
+        int score[3];
+        long count;
+        int winner;
+    };
 }
 
 using namespace Day21;
@@ -66,7 +74,7 @@ class AocDay21 : public AocDay
         AocDay21();
         ~AocDay21();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif
