@@ -136,3 +136,4 @@
 20,2,test_cases/day20_test1.txt,3351
 20,2,day20_input.txt,16757
 21,1,test_cases/day21_test1.txt,739785
+21,1,day21_input.txt,926610
