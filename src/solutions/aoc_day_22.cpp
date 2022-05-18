@@ -182,6 +182,20 @@ namespace Day22
                 cout << "    Decrementing maximum of " << current->min << "-" << current->max << " to " << min_x-1 << endl;
                 current->max = min_x-1;
             }
+            
+            // split out to two ranges if needed
+            if (current->min <= min_x && current->max >= max_x)
+            {
+                cout << "    Splitting current of " << current->min << "-" << current->max << " to " << current->min << "-" << min_x-1 << " and " << max_x+1 << "-" << current->max << endl;
+                OnPair * second = new OnPair;
+                second->max = current->max;
+                second->next = current->next;
+                second->min = max_x + 1;
+                current->max = min_x - 1;
+                current->next = second;
+            }
+                
+            
             current = current->next;
         }
         cout << "    ADJUSTED: ";
