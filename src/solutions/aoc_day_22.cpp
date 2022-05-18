@@ -36,6 +36,118 @@ namespace Day22
         cout << "    BEFORE: ";
         display();
         
+        if (m_head_pair == NULL)
+        {
+            cout << "    Creating first head pair" << endl;
+            m_head_pair = new OnPair();
+            m_head_pair->min = min_x;
+            m_head_pair->max = max_x;
+            m_head_pair->next = NULL;
+        }
+        else
+        {
+            // plan is to first place this item in order and then adjust as needed
+            // check if it should be first
+            if (min_x < m_head_pair->min)
+            {
+                cout << "    Creating new head pair" << endl;
+                OnPair * new_head = new OnPair();
+                new_head->min = min_x;
+                new_head->max = max_x;
+                new_head->next = m_head_pair;
+                m_head_pair = new_head;
+            }
+            else
+            {
+                OnPair * current = m_head_pair;
+                OnPair * next = current->next;
+                bool added = false;
+                while (next != NULL)
+                {
+                    if (min_x >= current->min && min_x < next->min)
+                    {
+                        cout << "    Creating pair between " << current->min << "-" << current->max << " and " << next->min << "-" << next->max << endl;
+                        OnPair * pair = new OnPair();
+                        pair->min = min_x;
+                        pair->max = max_x;
+                        pair->next = next;
+                        current->next = pair;
+                        added = true;
+                        break;
+                    }
+                    current = next;
+                    next = current->next;
+                }
+                if (!added)
+                {
+                    cout << "    Creating pair after final pair " << current->min << "-" << current->max << endl;
+                    OnPair * pair = new OnPair();
+                    pair->min = min_x;
+                    pair->max = max_x;
+                    pair->next = NULL;
+                    current->next = pair;
+                }
+            }
+            cout << "    INSERTED: ";
+            display();
+            // now combine as needed
+            if (m_head_pair->next != NULL)
+            {
+                OnPair * current = m_head_pair;
+                OnPair * next = current->next;
+                while (next != NULL)
+                {
+                    // the minimum are the same. make current the larger range
+                    if (current->min == next->min)
+                    {
+                        if (current->max < next->max)
+                        {
+                            current->max = next->max;
+                        }
+                        cout << "    Combining two equal current ranges" << endl;
+                        current->next = next->next;
+                        delete next;
+                        next = current->next;
+                    }
+                    // at this point, we know next->min is larger than current->min
+                    // if next's min is less than or equal to current's max, expand current to include next
+                    else if (next->min <= current->max)
+                    {
+                        if (next->max <= current->max)
+                        {
+                            cout << "    Next is currently within current. deleting next" << endl;
+                            {
+                                current->next = next->next;
+                                delete next;
+                                next = current->next;
+                            }
+                        }
+                        else
+                        {
+                            cout << "    Expanding current to include partially-overlapped next" << endl;
+                            current->max = next->max;
+                            current->next = next->next;
+                            delete next;
+                            next = current->next;
+                        }
+                    }
+                    // if ranges are adjacent, combine them
+                    else if (next->min == current->max + 1)
+                    {
+                        cout << "    Expanding to combine adjacent regions" << endl;
+                        current->max = next->max;
+                        current->next = next->next;
+                        delete next;
+                        next = current->next;
+                    }
+                    else
+                    {
+                        current = next;
+                        next = current->next;
+                    }
+                }
+            }
+        }
         cout << "    AFTER: ";
         display();
         
@@ -75,8 +187,10 @@ namespace Day22
             OnPair * current = m_head_pair;
             while (current != NULL)
             {
-                cout << "   [" << current->min << "," << current->max << "]  " << endl;
+                cout << "   [" << current->min << "," << current->max << "]  ";
+                current = current->next;
             }
+            cout << endl;
         }
     }
     
