@@ -159,6 +159,49 @@ namespace Day22
         cout << "    BEFORE: ";
         display();
         
+        // delete any we need to from the head pair that are fully in region to turn off
+        while (m_head_pair != NULL && m_head_pair->min >= min_x && m_head_pair->max <= max_x)
+        {
+            cout << "    Deleting head pair of " << m_head_pair->min << "-" << m_head_pair->max << endl;
+            OnPair * next = m_head_pair->next;
+            delete m_head_pair;
+            m_head_pair = next;
+        }
+        
+        OnPair * current = m_head_pair;
+        while (current != NULL)
+        {
+            // modify minimum of current if needed
+            if (current->min >= min_x && current->min <= max_x)
+            {
+                cout << "    Incrementing minimum of " << current->min << "-" << current->max << " to " << max_x+1 << endl;
+                current->min = max_x+1;
+            }
+            if (current->max >= min_x && current->max <= max_x)
+            {
+                cout << "    Decrementing maximum of " << current->min << "-" << current->max << " to " << min_x-1 << endl;
+                current->max = min_x-1;
+            }
+            current = current->next;
+        }
+        cout << "    ADJUSTED: ";
+        display();
+        
+        // delete any nodex where maximum < minimum 
+        // from first logic, m_head_pair should never need to be deleted
+        current = m_head_pair;
+        while (current != NULL)
+        {
+            OnPair * next = current->next;
+            if (next != NULL && next->max < next->min)
+            {
+                cout << "    Deleting invalid pair " << endl;
+                current->next = next->next;
+                delete next;
+            }
+            current = current->next;
+        }
+        
         cout << "    AFTER: ";
         display();
     
