@@ -141,4 +141,6 @@
 21,2,day21_input.txt,146854918035875
 22,1,test_cases/day22_test1.txt,39
 22,1,test_cases/day22_test2.txt,590784
+22,1,test_cases/day22_test3.txt,474140
 22,1,day22_input.txt,547648
+22,2,test_cases/day22_test3.txt,2758514936282235
