@@ -341,6 +341,7 @@ namespace Day22
     
     void Space::dump_space()
     {
+        /*
         if (m_head == NULL)
         {
             cout << "SPACE:       No elements" << endl;
@@ -358,6 +359,7 @@ namespace Day22
             }
             cout << "SPACE:       Done" << endl;
         }
+        */
     }
     
     void Space::turn_on(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
@@ -401,7 +403,9 @@ namespace Day22
         
         if (m_head == NULL)
         {
+        /*
             cout << "SPACE:  Head is not defined - Creating first on element" << endl;
+        */
             m_head = new_space;
             m_tail = new_space;
             new_space->prev = NULL;
@@ -409,14 +413,18 @@ namespace Day22
         }
         else
         {
+        /*
             cout << "SPACE:  Head and tail defined - Adding as last element" << endl;
+        */
             m_tail->next = new_space;
             new_space->prev = m_tail;
             new_space->next = NULL;
             m_tail = new_space;
         }
+        /*
         cout << "SPACE:   Count is " << get_count_on() << endl;
         dump_space();
+        */
         /*
         if (get_count_on() != get_count_on_old())
         {
@@ -444,8 +452,10 @@ namespace Day22
         }
         */
         turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
+        /*
         cout << "SPACE:   Count is " << get_count_on() << endl;
         dump_space();
+        */
         /*
         if (get_count_on() != get_count_on_old())
         {
@@ -487,9 +497,11 @@ namespace Day22
     
     void Space::create_on_space(int min_x, int max_x, int min_y, int max_y, int min_z, int max_z, OnSpace ** head, OnSpace ** current)
     {
+        /*
         cout << "SPACE:     Creating Space z from " << min_z << "-" << max_z 
              << " and y from " << min_y << "-" << max_y
              << " and x from " << min_x << "-" << max_x << endl;
+        */
         OnSpace * space = new OnSpace();
         space->min_x = min_x;
         space->max_x = max_x;
@@ -501,12 +513,16 @@ namespace Day22
         space->next = NULL;
         if (*current != NULL)
         {
+        /*
             cout << "Setting current" << endl;
+        */
             (*current)->next = space;
         }
         if (*head == NULL)
         {
+        /*
             cout << "Setting head" << endl;
+        */
             *head = space;
         }
         *current = space;
@@ -527,18 +543,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x low/y low/z low" << endl;
+                    //cout << "SPACE:     Creating x low/y low/z low" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x low/y low/z off" << endl;
+                    //cout << "SPACE:     Creating x low/y low/z off" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x low/y low/z high" << endl;
+                    //cout << "SPACE:     Creating x low/y low/z high" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -547,18 +563,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x low/y off/z low" << endl;
+                    //cout << "SPACE:     Creating x low/y off/z low" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x low/y off/z off" << endl;
+                    //cout << "SPACE:     Creating x low/y off/z off" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x low/y off/z high" << endl;
+                    //cout << "SPACE:     Creating x low/y off/z high" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -568,18 +584,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x low/y high/z low" << endl;
+                    //cout << "SPACE:     Creating x low/y high/z low" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x low/y high/z off" << endl;
+                    //cout << "SPACE:     Creating x low/y high/z off" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x low/y high/z high" << endl;
+                    //cout << "SPACE:     Creating x low/y high/z high" << endl;
                     create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -592,18 +608,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x mid/y low/z low" << endl;
+                    //cout << "SPACE:     Creating x mid/y low/z low" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x mid/y low/z off" << endl;
+                    //cout << "SPACE:     Creating x mid/y low/z off" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x mid/y low/z high" << endl;
+                    //cout << "SPACE:     Creating x mid/y low/z high" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -612,7 +628,7 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x mid/y off/z low" << endl;
+                    //cout << "SPACE:     Creating x mid/y off/z low" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid - this is the area being turned off. skip it
@@ -621,7 +637,7 @@ namespace Day22
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x mid/y off/z high" << endl;
+                    //cout << "SPACE:     Creating x mid/y off/z high" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -631,18 +647,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x mid/y high/z low" << endl;
+                    //cout << "SPACE:     Creating x mid/y high/z low" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x mid/y high/z off" << endl;
+                    //cout << "SPACE:     Creating x mid/y high/z off" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x mid/y high/z high" << endl;
+                    //cout << "SPACE:     Creating x mid/y high/z high" << endl;
                     create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -656,18 +672,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x high/y low/z low" << endl;
+                    //cout << "SPACE:     Creating x high/y low/z low" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x high/y low/z off" << endl;
+                    //cout << "SPACE:     Creating x high/y low/z off" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x high/y low/z high" << endl;
+                    //cout << "SPACE:     Creating x high/y low/z high" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -676,18 +692,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x high/y off/z low" << endl;
+                    //cout << "SPACE:     Creating x high/y off/z low" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x high/y off/z off" << endl;
+                    //cout << "SPACE:     Creating x high/y off/z off" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x high/y off/z high" << endl;
+                    //cout << "SPACE:     Creating x high/y off/z high" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -697,18 +713,18 @@ namespace Day22
                 // Z low
                 if (z_coordinates.use_low_on)
                 {
-                    cout << "SPACE:     Creating x high/y high/z low" << endl;
+                    //cout << "SPACE:     Creating x high/y high/z low" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
                 }
                 // Z mid
                 {
-                    cout << "SPACE:     Creating x high/y high/z off" << endl;
+                    //cout << "SPACE:     Creating x high/y high/z off" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
                 }
                 // Z high
                 if (z_coordinates.use_high_on)
                 {
-                    cout << "SPACE:     Creating x high/y high/z high" << endl;
+                    //cout << "SPACE:     Creating x high/y high/z high" << endl;
                     create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
                 }
             }
@@ -733,20 +749,25 @@ namespace Day22
         OnSpace * current = m_head;
         while (current != NULL)
         {
+            /*
             cout << "SPACE:  Comparing against z from " << current->min_z << "-" << current->max_z 
              << " and y from " << current->min_y << "-" << current->max_y
              << " and x from " << current->min_x << "-" << current->max_x << endl;
+            */
             
             if (!(current->max_x < min_x || current->min_x > max_x || 
                   current->max_y < min_y || current->min_y > max_y ||
                   current->max_z < min_z || current->min_z > max_z))
             {
+            /*
                 cout << "SPACE:   There is overlap" << endl;
+            */
                 OnOffCoordinates x_coordinates, y_coordinates, z_coordinates;
                 set_on_off_coordinates(min_x, max_x, current->min_x, current->max_x, x_coordinates);
                 set_on_off_coordinates(min_y, max_y, current->min_y, current->max_y, y_coordinates);
                 set_on_off_coordinates(min_z, max_z, current->min_z, current->max_z, z_coordinates);
                 
+                /*
                 if (x_coordinates.use_low_on)
                 {
                     cout << "SPACE:    X low on is true; will stay on from " << x_coordinates.low_on_min << "-" << x_coordinates.low_on_max << endl;
@@ -795,16 +816,18 @@ namespace Day22
                 {
                     cout << "SPACE:    Z high on is false; no need to keep the high side" << endl;
                 }
+                */
                 
                 OnSpace * repl_head = NULL;
                 OnSpace * repl_tail = NULL;
                 make_spaces_from_coordinates(x_coordinates, y_coordinates, z_coordinates, &repl_head, &repl_tail);
                 
-                cout << repl_head << " " << repl_tail << endl;
                 if (repl_head == NULL && repl_tail == NULL)
                 {
                     bool start_at_head = false;
+                    /*
                     cout << "SPACE:    No elements left after turning off" << endl;
+                    */
                     if (current == m_tail)
                     {
                         m_tail = current->prev;
@@ -866,7 +889,9 @@ namespace Day22
             }
             else
             {
+                /*
                 cout << "SPACE:   There is no overlap. Skipping to next space" << endl;
+                */
                 current = current->next;
             }
         }    
