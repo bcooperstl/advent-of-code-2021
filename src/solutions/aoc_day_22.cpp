@@ -218,7 +218,6 @@ namespace Day22
         
         cout << "    AFTER: ";
         display();
-    
     }
     
     long Row::get_count_on()
@@ -340,6 +339,27 @@ namespace Day22
         }
     }
     
+    void Space::dump_space()
+    {
+        if (m_head == NULL)
+        {
+            cout << "SPACE:       No elements" << endl;
+        }
+        else
+        {
+            cout << "SPACE:       Displaying elements" << endl;
+            OnSpace * current = m_head;
+            while (current != NULL)
+            {
+                cout << "SPACE:         z from " << current->min_z << "-" << current->max_z 
+                << " and y from " << current->min_y << "-" << current->max_y
+                << " and x from " << current->min_x << "-" << current->max_x << endl;
+                current = current->next;
+            }
+            cout << "SPACE:       Done" << endl;
+        }
+    }
+    
     void Space::turn_on(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
     {
         cout << "Turning on with planes z from " << min_z << " to " << max_z << endl;
@@ -394,6 +414,11 @@ namespace Day22
             m_tail = new_space;
         }
         cout << "SPACE:   Count is " << get_count_on() << endl;
+        dump_space();
+        if (get_count_on() != get_count_on_old())
+        {
+            cout << "*************MISMATCH HERE**************" << endl;
+        }
     }
     
     void Space::turn_off(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
@@ -414,6 +439,11 @@ namespace Day22
         }
         turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
         cout << "SPACE:   Count is " << get_count_on() << endl;
+        dump_space();
+        if (get_count_on() != get_count_on_old())
+        {
+            cout << "*************MISMATCH HERE**************" << endl;
+        }
     }
     
     void Space::set_on_off_coordinates(int off_min, int off_max, int space_min, int space_max, OnOffCoordinates & coordinates)
@@ -765,11 +795,8 @@ namespace Day22
                 cout << repl_head << " " << repl_tail << endl;
                 if (repl_head == NULL && repl_tail == NULL)
                 {
+                    bool start_at_head = false;
                     cout << "SPACE:    No elements left after turning off" << endl;
-                    if (current == m_head)
-                    {
-                        m_head = current->next;
-                    }
                     if (current == m_tail)
                     {
                         m_tail = current->prev;
@@ -782,10 +809,19 @@ namespace Day22
                     {
                         current->next->prev = current->prev;
                     }
-                    
-                    OnSpace * next = current->next;
-                    delete current;
-                    current = next;
+
+                    if (current == m_head)
+                    {
+                        m_head = current->next;
+                        delete current;
+                        current = m_head; // start at the head on the next time throgh
+                    }
+                    else
+                    {
+                        OnSpace * next = current->next;
+                        delete current;
+                        current = next;
+                    }
                 }
                 else
                 {
@@ -816,16 +852,15 @@ namespace Day22
                 
                     // finally - delete the current member and set it to be the last one we created. it'll increment outside this if
                     delete current;
-                    current = repl_tail;
+                    current = repl_tail->next;
                 }
                 
             }
             else
             {
                 cout << "SPACE:   There is no overlap. Skipping to next space" << endl;
+                current = current->next;
             }
-            
-            current = current->next;
         }    
     }
     

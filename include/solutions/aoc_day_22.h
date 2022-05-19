@@ -87,6 +87,7 @@ namespace Day22
             void set_on_off_coordinates(int off_min, int off_max, int space_min, int space_max, OnOffCoordinates & coordinates);
             void create_on_space(int min_x, int max_x, int min_y, int max_y, int min_z, int max_z, OnSpace ** head, OnSpace ** current);
             void make_spaces_from_coordinates(OnOffCoordinates x_coordinates, OnOffCoordinates y_coordinates, OnOffCoordinates z_coordinates, OnSpace ** first, OnSpace ** last);
+            void dump_space();
         public:
             Space();
             ~Space();
