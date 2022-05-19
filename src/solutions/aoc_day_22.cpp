@@ -729,9 +729,9 @@ namespace Day22
              << " and y from " << current->min_y << "-" << current->max_y
              << " and x from " << current->min_x << "-" << current->max_x << endl;
             
-            if (((current->min_x >= min_x && current->min_x <= max_x) || (current->max_x >= min_x && current->max_x <= max_x)) &&
-                ((current->min_y >= min_y && current->min_y <= max_y) || (current->max_y >= min_y && current->max_y <= max_y)) &&
-                ((current->min_z >= min_z && current->min_z <= max_z) || (current->max_z >= min_z && current->max_z <= max_z)))
+            if (!(current->max_x < min_x || current->min_x > max_x || 
+                  current->max_y < min_y || current->min_y > max_y ||
+                  current->max_z < min_z || current->min_z > max_z))
             {
                 cout << "SPACE:   There is overlap" << endl;
                 OnOffCoordinates x_coordinates, y_coordinates, z_coordinates;
