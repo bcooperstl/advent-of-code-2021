@@ -30,12 +30,12 @@ namespace Day22
     
     struct OnSpace
     {
-        int min_x;
-        int max_x;
-        int min_y;
-        int max_y;
-        int min_z;
-        int max_z;
+        long min_x;
+        long max_x;
+        long min_y;
+        long max_y;
+        long min_z;
+        long max_z;
         OnSpace * prev;
         OnSpace * next;
     };
@@ -111,7 +111,7 @@ class AocDay22 : public AocDay
         AocDay22();
         ~AocDay22();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif

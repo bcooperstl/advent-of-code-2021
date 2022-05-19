@@ -362,6 +362,7 @@ namespace Day22
     
     void Space::turn_on(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
     {
+        /*
         cout << "Turning on with planes z from " << min_z << " to " << max_z << endl;
         for (int z=min_z; z<=max_z; z++)
         {
@@ -380,6 +381,7 @@ namespace Day22
             }
             plane->turn_on(min_y, max_y, min_x, max_x);
         }
+        */
         
         // use the same turn_off_space code to remove anything in this cube, so that I can insert it as a whole one
         turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
@@ -415,14 +417,17 @@ namespace Day22
         }
         cout << "SPACE:   Count is " << get_count_on() << endl;
         dump_space();
+        /*
         if (get_count_on() != get_count_on_old())
         {
             cout << "*************MISMATCH HERE**************  expected " << get_count_on_old() << " got " << get_count_on() << endl;
         }
+        */
     }
     
     void Space::turn_off(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
     {
+        /*
         cout << "Turning off with planes z from " << min_z << " to " << max_z << endl;
         for (int z=min_z; z<=max_z; z++)
         {
@@ -437,13 +442,16 @@ namespace Day22
                 cout << " Skipping missing plane z=" << z << endl;
             }
         }
+        */
         turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
         cout << "SPACE:   Count is " << get_count_on() << endl;
         dump_space();
+        /*
         if (get_count_on() != get_count_on_old())
         {
             cout << "*************MISMATCH HERE**************  expected " << get_count_on_old() << " got " << get_count_on() << endl;
         }
+        */
     }
     
     void Space::set_on_off_coordinates(int off_min, int off_max, int space_min, int space_max, OnOffCoordinates & coordinates)
@@ -878,7 +886,8 @@ namespace Day22
     
     long Space::get_count_on(OnSpace * space)
     {
-        return ((space->max_x - space->min_x + 1) * (space->max_y - space->min_y + 1) * (space->max_z - space->min_z + 1));
+        // All numbers are 1 as a long
+        return ((space->max_x - space->min_x + 1l) * (space->max_y - space->min_y + 1l) * (space->max_z - space->min_z + 1l));
     }
     
     long Space::get_count_on()
@@ -961,6 +970,28 @@ string AocDay22::part1(string filename, vector<string> extra_args)
             {
                 space.turn_off(steps[i].min_z, steps[i].max_z, steps[i].min_y, steps[i].max_y, steps[i].min_x, steps[i].max_x);
             }
+        }
+    }
+    
+    ostringstream out;
+    out << space.get_count_on();
+    return out.str();
+}
+
+string AocDay22::part2(string filename, vector<string> extra_args)
+{
+    Space space;
+    vector<Step> steps = parse_input(filename);
+    
+    for (int i=0; i<steps.size(); i++)
+    {
+        if (steps[i].method == "on")
+        {
+            space.turn_on(steps[i].min_z, steps[i].max_z, steps[i].min_y, steps[i].max_y, steps[i].min_x, steps[i].max_x);
+        }
+        else
+        {
+            space.turn_off(steps[i].min_z, steps[i].max_z, steps[i].min_y, steps[i].max_y, steps[i].min_x, steps[i].max_x);
         }
     }
     
