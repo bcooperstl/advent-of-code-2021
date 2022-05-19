@@ -318,6 +318,8 @@ namespace Day22
     
     Space::Space()
     {
+        m_head = NULL;
+        m_tail = NULL;
     }
     
     Space::~Space()
@@ -327,6 +329,14 @@ namespace Day22
         {
             delete pos->second;
             ++pos;
+        }
+        
+        OnSpace * current = m_head;
+        while (current != NULL)
+        {
+            OnSpace * next = current->next;
+            delete current;
+            current = next;
         }
     }
     
@@ -350,6 +360,40 @@ namespace Day22
             }
             plane->turn_on(min_y, max_y, min_x, max_x);
         }
+        
+        // use the same turn_off_space code to remove anything in this cube, so that I can insert it as a whole one
+        turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
+        
+        // now that the prior on areas have been modified to turn off overlapping cells, create the new On section and put it at the end
+        OnSpace * new_space = new OnSpace();
+        new_space->min_x = min_x;
+        new_space->max_x = max_x;
+        new_space->min_y = min_y;
+        new_space->max_y = max_y;
+        new_space->min_z = min_z;
+        new_space->max_z = max_z;
+        
+        cout << "SPACE: Created new element with z from " << min_z << "-" << max_z 
+             << " and y from " << min_y << "-" << max_y
+             << " and x from " << min_x << "-" << max_x << endl;
+        
+        if (m_head == NULL)
+        {
+            cout << "SPACE:  Head is not defined - Creating first on element" << endl;
+            m_head = new_space;
+            m_tail = new_space;
+            new_space->prev = NULL;
+            new_space->next = NULL;
+        }
+        else
+        {
+            cout << "SPACE:  Head and tail defined - Adding as last element" << endl;
+            m_tail->next = new_space;
+            new_space->prev = m_tail;
+            new_space->next = NULL;
+            m_tail = new_space;
+        }
+        cout << "SPACE:   Count is " << get_count_on() << endl;
     }
     
     void Space::turn_off(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
@@ -368,9 +412,424 @@ namespace Day22
                 cout << " Skipping missing plane z=" << z << endl;
             }
         }
+        turn_off_space(min_z, max_z, min_y, max_y, min_x, max_x);
+        cout << "SPACE:   Count is " << get_count_on() << endl;
     }
     
-    long Space::get_count_on()
+    void Space::set_on_off_coordinates(int off_min, int off_max, int space_min, int space_max, OnOffCoordinates & coordinates)
+    {
+        coordinates.off_min = (off_min >= space_min ? off_min : space_min);
+        coordinates.off_max = (off_max <= space_max ? off_max : space_max);
+
+        int off_on_min = off_min - 1; // the on value just below the off_min
+        int off_on_max = off_max + 1; // the on value just above the off_max
+        
+        if (space_min <= off_on_min)
+        {
+            coordinates.use_low_on = true;
+            coordinates.low_on_min = space_min;
+            coordinates.low_on_max = off_on_min;
+        }
+        else
+        {
+            coordinates.use_low_on = false;
+        }
+        
+        if (space_max >= off_on_max)
+        {
+            coordinates.use_high_on = true;
+            coordinates.high_on_min = off_on_max;
+            coordinates.high_on_max = space_max;
+        }
+        else
+        {
+            coordinates.use_high_on = false;
+        }
+    }
+    
+    void Space::create_on_space(int min_x, int max_x, int min_y, int max_y, int min_z, int max_z, OnSpace ** head, OnSpace ** current)
+    {
+        cout << "SPACE:     Creating Space z from " << min_z << "-" << max_z 
+             << " and y from " << min_y << "-" << max_y
+             << " and x from " << min_x << "-" << max_x << endl;
+        OnSpace * space = new OnSpace();
+        space->min_x = min_x;
+        space->max_x = max_x;
+        space->min_y = min_y;
+        space->max_y = max_y;
+        space->min_z = min_z;
+        space->max_z = max_z;
+        space->prev = *current;
+        space->next = NULL;
+        if (*current != NULL)
+        {
+            cout << "Setting current" << endl;
+            (*current)->next = space;
+        }
+        if (*head == NULL)
+        {
+            cout << "Setting head" << endl;
+            *head = space;
+        }
+        *current = space;
+        return;
+    }
+    
+    void Space::make_spaces_from_coordinates(OnOffCoordinates x_coordinates, OnOffCoordinates y_coordinates, OnOffCoordinates z_coordinates, OnSpace ** first, OnSpace ** last)
+    {
+        OnSpace * ret_head = NULL;
+        OnSpace * current = NULL;
+        // Make up to 26 spaces
+        // X low
+        if (x_coordinates.use_low_on)
+        {
+            // Y low
+            if (y_coordinates.use_low_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x low/y low/z low" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x low/y low/z off" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x low/y low/z high" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y mid
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x low/y off/z low" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x low/y off/z off" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x low/y off/z high" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y high
+            if (y_coordinates.use_high_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x low/y high/z low" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x low/y high/z off" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x low/y high/z high" << endl;
+                    create_on_space(x_coordinates.low_on_min, x_coordinates.low_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+        }
+        // X mid
+        {
+            // Y low
+            if (y_coordinates.use_low_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x mid/y low/z low" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x mid/y low/z off" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x mid/y low/z high" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y mid
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x mid/y off/z low" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid - this is the area being turned off. skip it
+                {
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x mid/y off/z high" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y high
+            if (y_coordinates.use_high_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x mid/y high/z low" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x mid/y high/z off" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x mid/y high/z high" << endl;
+                    create_on_space(x_coordinates.off_min, x_coordinates.off_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+        }            
+        // X high
+        if (x_coordinates.use_high_on)
+        {
+            // Y low
+            if (y_coordinates.use_low_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x high/y low/z low" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x high/y low/z off" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x high/y low/z high" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.low_on_min, y_coordinates.low_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y mid
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x high/y off/z low" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x high/y off/z off" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x high/y off/z high" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.off_min, y_coordinates.off_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+            // Y high
+            if (y_coordinates.use_high_on)
+            {
+                // Z low
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:     Creating x high/y high/z low" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.low_on_min, z_coordinates.low_on_max, &ret_head, &current);
+                }
+                // Z mid
+                {
+                    cout << "SPACE:     Creating x high/y high/z off" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.off_min, z_coordinates.off_max, &ret_head, &current);
+                }
+                // Z high
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:     Creating x high/y high/z high" << endl;
+                    create_on_space(x_coordinates.high_on_min, x_coordinates.high_on_max, y_coordinates.high_on_min, y_coordinates.high_on_max, z_coordinates.high_on_min, z_coordinates.high_on_max, &ret_head, &current);
+                }
+            }
+        }
+        *first = ret_head;
+        *last = current;
+        return;
+    }
+    
+    void Space::turn_off_space(int min_z, int max_z, int min_y, int max_y, int min_x, int max_x)
+    {
+        cout << "SPACE: Turning off with z from " << min_z << "-" << max_z 
+             << " and y from " << min_y << "-" << max_y
+             << " and x from " << min_x << "-" << max_x << endl;
+        if (m_head == NULL)
+        {
+            cout << "SPACE:  No head defined - nothing to turn off" << endl;
+            return;
+        }
+        
+        // need to compare each node in the OnSpace list to see if it has to be turned off or not
+        OnSpace * current = m_head;
+        while (current != NULL)
+        {
+            cout << "SPACE:  Comparing against z from " << current->min_z << "-" << current->max_z 
+             << " and y from " << current->min_y << "-" << current->max_y
+             << " and x from " << current->min_x << "-" << current->max_x << endl;
+            
+            if (((current->min_x >= min_x && current->min_x <= max_x) || (current->max_x >= min_x && current->max_x <= max_x)) &&
+                ((current->min_y >= min_y && current->min_y <= max_y) || (current->max_y >= min_y && current->max_y <= max_y)) &&
+                ((current->min_z >= min_z && current->min_z <= max_z) || (current->max_z >= min_z && current->max_z <= max_z)))
+            {
+                cout << "SPACE:   There is overlap" << endl;
+                OnOffCoordinates x_coordinates, y_coordinates, z_coordinates;
+                set_on_off_coordinates(min_x, max_x, current->min_x, current->max_x, x_coordinates);
+                set_on_off_coordinates(min_y, max_y, current->min_y, current->max_y, y_coordinates);
+                set_on_off_coordinates(min_z, max_z, current->min_z, current->max_z, z_coordinates);
+                
+                if (x_coordinates.use_low_on)
+                {
+                    cout << "SPACE:    X low on is true; will stay on from " << x_coordinates.low_on_min << "-" << x_coordinates.low_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    X low on is false; no need to keep the low side" << endl;
+                }
+                if (x_coordinates.use_high_on)
+                {
+                    cout << "SPACE:    X high on is true; will stay on from " << x_coordinates.high_on_min << "-" << x_coordinates.high_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    X high on is false; no need to keep the high side" << endl;
+                }
+                if (y_coordinates.use_low_on)
+                {
+                    cout << "SPACE:    Y low on is true; will stay on from " << y_coordinates.low_on_min << "-" << y_coordinates.low_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    Y low on is false; no need to keep the low side" << endl;
+                }
+                if (y_coordinates.use_high_on)
+                {
+                    cout << "SPACE:    Y high on is true; will stay on from " << y_coordinates.high_on_min << "-" << y_coordinates.high_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    Y high on is false; no need to keep the high side" << endl;
+                }
+                if (z_coordinates.use_low_on)
+                {
+                    cout << "SPACE:    Z low on is true; will stay on from " << z_coordinates.low_on_min << "-" << z_coordinates.low_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    Z low on is false; no need to keep the low side" << endl;
+                }
+                if (z_coordinates.use_high_on)
+                {
+                    cout << "SPACE:    Z high on is true; will stay on from " << z_coordinates.high_on_min << "-" << z_coordinates.high_on_max << endl;
+                }
+                else
+                {
+                    cout << "SPACE:    Z high on is false; no need to keep the high side" << endl;
+                }
+                
+                OnSpace * repl_head = NULL;
+                OnSpace * repl_tail = NULL;
+                make_spaces_from_coordinates(x_coordinates, y_coordinates, z_coordinates, &repl_head, &repl_tail);
+                
+                cout << repl_head << " " << repl_tail << endl;
+                if (repl_head == NULL && repl_tail == NULL)
+                {
+                    cout << "SPACE:    No elements left after turning off" << endl;
+                    if (current == m_head)
+                    {
+                        m_head = current->next;
+                    }
+                    if (current == m_tail)
+                    {
+                        m_tail = current->prev;
+                    }
+                    if (current->prev != NULL)
+                    {
+                        current->prev->next = current->next;
+                    }
+                    if (current->next != NULL)
+                    {
+                        current->next->prev = current->prev;
+                    }
+                    
+                    OnSpace * next = current->next;
+                    delete current;
+                    current = next;
+                }
+                else
+                {
+                    // we now have a linked list from repl_head to repl_tail that we need to sub in place for current
+                    // 1) fix up and head/tail variables
+                    if (current == m_head)
+                    {
+                        m_head = repl_head;
+                    }
+                    if (current == m_tail)
+                    {
+                        m_tail = repl_tail;
+                    }
+                    
+                    // link the prior element and the head of our new list
+                    repl_head->prev = current->prev;
+                    if (current->prev != NULL)
+                    {
+                        current->prev->next = repl_head;
+                    }
+                    
+                    // link the next element and the tail of our new list
+                    repl_tail->next = current->next;
+                    if (current->next != NULL)
+                    {
+                        current->next->prev = repl_tail;
+                    }
+                
+                    // finally - delete the current member and set it to be the last one we created. it'll increment outside this if
+                    delete current;
+                    current = repl_tail;
+                }
+                
+            }
+            else
+            {
+                cout << "SPACE:   There is no overlap. Skipping to next space" << endl;
+            }
+            
+            current = current->next;
+        }    
+    }
+    
+    long Space::get_count_on_old()
     {
         long count = 0;
         map<int, Plane *>::iterator pos = m_planes.begin();
@@ -381,6 +840,25 @@ namespace Day22
         }
         return count;
     }
+    
+    long Space::get_count_on(OnSpace * space)
+    {
+        return ((space->max_x - space->min_x + 1) * (space->max_y - space->min_y + 1) * (space->max_z - space->min_z + 1));
+    }
+    
+    long Space::get_count_on()
+    {
+        long count = 0;
+        OnSpace * current = m_head;
+        while (current != NULL)
+        {
+            count+=get_count_on(current);
+            current = current->next;
+        }
+        return count;
+    }
+    
+    
         
 };
 
@@ -450,7 +928,7 @@ string AocDay22::part1(string filename, vector<string> extra_args)
             }
         }
     }
-            
+    
     ostringstream out;
     out << space.get_count_on();
     return out.str();
