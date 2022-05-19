@@ -417,7 +417,7 @@ namespace Day22
         dump_space();
         if (get_count_on() != get_count_on_old())
         {
-            cout << "*************MISMATCH HERE**************" << endl;
+            cout << "*************MISMATCH HERE**************  expected " << get_count_on_old() << " got " << get_count_on() << endl;
         }
     }
     
@@ -442,7 +442,7 @@ namespace Day22
         dump_space();
         if (get_count_on() != get_count_on_old())
         {
-            cout << "*************MISMATCH HERE**************" << endl;
+            cout << "*************MISMATCH HERE**************  expected " << get_count_on_old() << " got " << get_count_on() << endl;
         }
     }
     
