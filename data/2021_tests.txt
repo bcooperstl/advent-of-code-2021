@@ -145,3 +145,4 @@
 22,1,day22_input.txt,547648
 22,2,test_cases/day22_test3.txt,2758514936282235
 22,2,day22_input.txt,1206644425246111
+23,1,test_cases/day23_test1.txt,12521
