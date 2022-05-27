@@ -89,10 +89,11 @@ namespace Day23
         return rep;
     }
     
-    SmallMove::SmallMove(SmallBoard * board, int depth)
+    SmallMove::SmallMove(SmallBoard * board, int cost)
     {
         m_board = board;
-        m_depth = depth;
+        m_cost = cost;
+        m_worked = false;
     }
     
     SmallMove::~SmallMove()
@@ -103,6 +104,161 @@ namespace Day23
     {
         return (m_board->get_representation() == FINAL_SMALL_REP);
     }
+    
+    bool SmallMove::is_worked()
+    {
+        return m_worked;
+    }
+    
+    int SmallMove::get_cost()
+    {
+        return m_cost;
+    }
+    
+    void SmallMove::set_cost(int cost)
+    {
+        m_cost = cost;
+    }
+    
+    AnthroMove::AnthroMove(char a, int f, int t, int s)
+    {
+        anthro = a;
+        from_rep = f;
+        to_rep = t;
+        steps = s;
+    }
+    
+    bool SmallMoves::all_positions_match(char * rep_str, char * match_str)
+    {
+        for (int i=0; i<SMALL_REP_STR_LENGTH; i++)
+        {
+            if (match_str[i] != ' ' && match_str[i] != rep_str[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    void SmallMoves::find_moves(map<string, SmallMove *> move_cache)
+    {
+        string representation = m_board->get_representation();
+        int rep_str = representation.c_str();
+        vector<AnthroMove> anthro_moves;
+        
+        /* 
+         #############
+         #...........#
+         ###B#C#B#D###
+           #A#D#C#A#
+           #########
+         #  #  #  #  #  #  #  #  #  #  #  ##
+         #  0  1  2  3  4  5  6  7  8  9 10#
+         #  #  # 11  # 12  # 13  # 14  #  ##
+               # 15  # 16  # 17  # 18  #  
+               #  #  #  #  #  #  #  #  #  
+
+        */
+        /* Hallway position 1; representation 0
+           A can move to 3,3(15) if 1,2(1) 1,3(2) 2,3(11) 3,3(15) are all open 1,2,11,15
+           A can move to 2,3(11) if 1,2(1) 1,3(2) 2,3(11) are open AND 3,3(15) is A
+           B can move to 5,3(16) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 2,5(12) 3,5(16) are all open
+           B can move to 5,2(12) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 2,5(12) are all open AND 3,5(16) is B
+           C can move to 7,3(17) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 1,6(5) 1,7(6) 2,7(13) 3,7(17) are all open
+           C can move to 7,2(13) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 1,6(5) 1,7(6) 2,7(13) are all open AND 3,7(17) is C
+           D can move to 9,3(18) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 1,6(5) 1,7(6) 1,8(7) 1,9(8) 2,9(14) 3,9(18) are all open
+           D can move to 9,2(14) if 1,2(1) 1,3(2) 1,4(3) 1,5(4) 1,6(5) 1,7(6) 1,8(7) 1,9(8) 2,9(14) are all open AND 3,9(18) is D
+        */
+        
+        //                                0123456789012345678
+        if (all_positions_match(rep_str, "A..        .   .   "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_A, 0, 15, 4));
+        }
+        if (all_positions_match(rep_str, "A..        .   A   "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_A, 0, 11, 3));
+        }
+        if (all_positions_match(rep_str, "B....       .   .  "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_B, 0, 16, 6));
+        }
+        if (all_positions_match(rep_str, "B....       .   B  "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_B, 0, 12, 5));
+        }
+        if (all_positions_match(rep_str, "C......      .   . "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_C, 0, 17, 8));
+        }
+        if (all_positions_match(rep_str, "C......      .   C "))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_C, 0, 13, 7));
+        }
+        if (all_positions_match(rep_str, "D........     .   ."))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_D, 0, 18, 10));
+        }
+        if (all_positions_match(rep_str, "D........     .   D"))
+        {
+            anthro_moves.push_back(Anthromove(ANTHRO_D, 0, 14, 9));
+        }
+        
+        if (rep_str[0] == ANTHRO_A)
+        {
+            if (rep_str[1] == OPEN && rep_str[2] == OPEN && rep_str[11] == OPEN)
+            {
+                if (rep_str[15] == OPEN)
+                {
+                    anthro_moves.push_back(Anthromove(ANTHRO_A, 0, 15, 4));
+                }
+                else if (rep_str[15] == ANTHRO_A)
+                {
+                    anthro_moves.push_back(AnthroMove(ANTHRO_A, 0, 11, 3);
+                }
+            }
+        }
+        else if (rep_str[0] == ANTHRO_B)
+        {
+            if (rep_str[1] == OPEN && rep_str[2] == OPEN && rep_str[3] == OPEN && rep_str[4] == OPEN && rep_str[12] == OPEN)
+            {
+                if (rep_str[15] == OPEN)
+                {
+                    anthro_moves.push_back(Anthromove(ANTHRO_B, 0, 15, 6));
+                }
+                else if (rep_str[15] == ANTHRO_B)
+                {
+                    anthro_moves.push_back(AnthroMove(ANTHRO_B, 0, 12, 5);
+                }
+            }
+        }
+        else if (rep_str[0] == ANTHRO_C)
+        {
+            if (rep_str[1] == OPEN && rep_str[2] == OPEN && rep_str[3] == OPEN && rep_str[4] == OPEN && && rep_str[3] == OPEN && rep_str[4] == OPEN && rep_str[12] == OPEN)
+            {
+                if (rep_str[15] == OPEN)
+                {
+                    anthro_moves.push_back(Anthromove(ANTHRO_B, 0, 15, 6));
+                }
+                else if (rep_str[15] == ANTHRO_B)
+                {
+                    anthro_moves.push_back(AnthroMove(ANTHRO_B, 0, 12, 5);
+                }
+            }
+        }
+            
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     void Board::display()
@@ -475,17 +631,15 @@ AocDay23::~AocDay23()
   #########
 */
 
-Move AocDay23::parse_input(string filename)
+void AocDay23::parse_input(string filename, Move & move, SmallBoard & small_board)
 {
     FileUtils fileutils;
     vector<string> lines;
     
-    Move move;
-    
     if (!fileutils.read_as_list_of_strings(filename, lines))
     {
         cerr << "Error reading in the data from " << filename << endl;
-        return move;
+        return;
     }
     
     for (int i=0; i<3; i++)
@@ -540,10 +694,7 @@ Move AocDay23::parse_input(string filename)
     move.parent = NULL;
     move.board.display();
 
-    SmallBoard board(lines);
-    board.display();
-
-    return move;    
+    small_board = SmallBoard(lines);
 }
 
 void AocDay23::find_best_move_depth_first_search(Move parent, int & lowest)
@@ -572,8 +723,11 @@ void AocDay23::find_best_move_depth_first_search(Move parent, int & lowest)
 
 string AocDay23::part1(string filename, vector<string> extra_args)
 {
-    Move move = parse_input(filename);
+    Move move;
+    SmallBoard small_board;
+    parse_input(filename, move, small_board);
     move.board.display();
+    small_board.display();
     int lowest = 0;
     
     find_best_move_depth_first_search(move, lowest);

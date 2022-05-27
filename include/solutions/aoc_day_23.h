@@ -33,6 +33,7 @@
 #define NUM_SMALL_ROWS 5
 
 #define FINAL_SMALL_REP "...........ABCDABCD"
+#define SMALL_REP_STR_LENGTH 19
 
 #define ROW_WIDTH 13
 
@@ -59,13 +60,25 @@ namespace Day23
     {
         private:
             SmallBoard * m_board;
-            int m_depth;
+            int m_cost;
+            bool m_worked;
         public:
-            SmallMove(SmallBoard * board, int depth);
+            SmallMove(SmallBoard * board, int cost);
             ~SmallMove();
             bool is_final();
+            bool is_worked();
+            int get_cost();
+            void update_cost(int cost);
     };
-            
+    
+    struct AnthroMove
+    {
+        char anthro;
+        int from_rep;
+        int to_rep;
+        int steps;
+        AnthroMove(char a, int f, int t, int s);
+    };
     
     struct Board
     {
@@ -105,7 +118,7 @@ using namespace Day23;
 class AocDay23 : public AocDay
 {
     private:
-        Move parse_input(string filename);
+        void parse_input(string filename, Move & move, SmallBoard & small_board);
         void find_best_move_depth_first_search(Move parent, int & lowest);
         static map<pair<int, int>, int> m_smallboard_index;
         map<int, pair<int, int>> m_smallboard_reverse_index;
