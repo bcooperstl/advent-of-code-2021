@@ -90,25 +90,25 @@ namespace Day23
         int from_col = positions[position].col;
         char anthro = positions[position].anthro;
         
-        cout << pad_str << "checking if anthro " << anthro << " can move from " << from_row << ", " << from_col << " to " << to_row << "," << to_col << endl;
+        //cout << pad_str << "checking if anthro " << anthro << " can move from " << from_row << ", " << from_col << " to " << to_row << "," << to_col << endl;
         // can only move into an open space
         if (board.layout[to_row][to_col] != OPEN)
         {
-            cout << pad_str << " destination is not open. no move" << endl;
+            //cout << pad_str << " destination is not open. no move" << endl;
             return false;
         }
         
         // cannot stop in the hallway above a room
         if (to_row == HALLWAY_ROW && (to_col == COL_A || to_col == COL_B || to_col == COL_C || to_col == COL_D))
         {
-            cout << pad_str << " destination is in hallway above a room. no move" << endl;
+            //cout << pad_str << " destination is in hallway above a room. no move" << endl;
             return false;
         }
         
         // never move from a hallway into a room unless that is their destination room
         if (from_row == HALLWAY_ROW && to_row == HALLWAY_ROW)
         {
-            cout << pad_str << " source and destination are both in hallway. no move" << endl;
+            //cout << pad_str << " source and destination are both in hallway. no move" << endl;
             return false;
         }
         
@@ -119,7 +119,7 @@ namespace Day23
              (anthro == ANTHRO_C && to_col != COL_C) ||
              (anthro == ANTHRO_D && to_col != COL_D)))
         {
-            cout << pad_str << " leaving in hallway and destination is not the right anthro's room column. no move" << endl;
+            //cout << pad_str << " leaving in hallway and destination is not the right anthro's room column. no move" << endl;
             return false;
         }
 
@@ -130,7 +130,7 @@ namespace Day23
         {
             if (board.layout[TOP_ROW][from_col] != OPEN)
             {
-                cout << pad_str << " source is bottom row, but top row is blocked. no move" << endl;
+                //cout << pad_str << " source is bottom row, but top row is blocked. no move" << endl;
                 return false;
             }
             steps = 2; // 2 steps to get to the hallway
@@ -146,7 +146,7 @@ namespace Day23
         {
             if (board.layout[TOP_ROW][to_col] != OPEN)
             {
-                cout << pad_str << " destination is bottom row in room, but top row is occupied. no move" << endl;
+                //cout << pad_str << " destination is bottom row in room, but top row is occupied. no move" << endl;
                 return false;
             }
             steps += 2; // 2 steps to get from hallway to bottom
@@ -155,7 +155,7 @@ namespace Day23
         {
             if (board.layout[BOTTOM_ROW][to_col] != anthro)
             {
-                cout << pad_str << " destination is top row in room, but bottom row is not the anthro. no move" << endl;
+                //cout << pad_str << " destination is top row in room, but bottom row is not the anthro. no move" << endl;
                 return false;
             }
             steps += 1; // 1 step to get from hallway to top
@@ -167,54 +167,198 @@ namespace Day23
         {
             if (board.layout[HALLWAY_ROW][col] != OPEN)
             {
-                cout << pad_str << " move blocked because of non-open space in hallway at column " << col << ". no move" << endl;
+                //cout << pad_str << " move blocked because of non-open space in hallway at column " << col << ". no move" << endl;
                 return false;
             }
             steps++;
         }
-        cout << pad_str << " move is possible in " << steps << " steps" << endl;
+        //cout << pad_str << " move is possible in " << steps << " steps" << endl;
+        return true;
+    }
+    
+    void Move::create_next_move(Move & next, int anthro, int to_row, int to_col, int steps)
+    {
+        // copy the board and current positions
+        for (int i=0; i<5; i++)
+        {
+            strncpy(next.board.layout[i], board.layout[i], 14);
+        }
+        for (int i=0; i<NUM_ANTHROS; i++)
+        {
+            next.positions[i].row = positions[i].row;
+            next.positions[i].col = positions[i].col;
+            next.positions[i].anthro = positions[i].anthro;
+        }
+        
+        // do the move
+        next.board.layout[to_row][to_col] = positions[anthro].anthro;
+        next.board.layout[positions[anthro].row][positions[anthro].col] = OPEN;
+        next.positions[anthro].row = to_row;
+        next.positions[anthro].col = to_col;
+        
+        // add the cost
+        switch (next.positions[anthro].anthro)
+        {
+            case ANTHRO_A:
+                next.cost = cost + (steps * COST_A);
+                break;
+            case ANTHRO_B:
+                next.cost = cost + (steps * COST_B);
+                break;
+            case ANTHRO_C:
+                next.cost = cost + (steps * COST_C);
+                break;
+            case ANTHRO_D:
+                next.cost = cost + (steps * COST_D);
+                break;
+        }
+        
+        // set the new depth
+        next.depth = depth + 1;
+        
+        // set the parent
+        next.parent = this;
+    }
+    
+    bool Move::has_matching_parent()
+    {
+        Move * current = parent;
+        while (current != NULL)
+        {
+            for (int i=0; i<5; i++)
+            {
+                if (strncmp(board.layout[i], current->board.layout[i], 14) != 0)
+                {
+                    return false;
+                }
+            }
+            current = current->parent;
+        }
+        cout << "matching parent found" << endl;
         return true;
     }
     
     vector<Move> Move::get_all_possible_moves()
     {
+        string pad_str(depth, ' ');
         vector<Move> moves;
         for (int anthro=0; anthro<NUM_ANTHROS; anthro++)
         {
             if (!is_final(anthro))
             {
+                Move next;
                 int steps;
                 // check all hallway moves
                 for (int col=COL_HALLWAY_LEFT; col <= COL_HALLWAY_RIGHT; col++)
                 {
                     if (can_move(anthro, HALLWAY_ROW, col, steps))
                     {
-                        // add it to the list
+                        create_next_move(next, anthro, HALLWAY_ROW, col, steps);
+                        if (next.has_matching_parent())
+                        {
+                            cout << pad_str << " move blocked because of matching parent found " << endl;
+                        }
+                        else
+                        {
+                            moves.push_back(next);
+                        }
                     }
                 }
                 if (can_move(anthro, BOTTOM_ROW, COL_A, steps))
                 {
+                    create_next_move(next, anthro, BOTTOM_ROW, COL_A, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, BOTTOM_ROW, COL_B, steps))
                 {
+                    create_next_move(next, anthro, BOTTOM_ROW, COL_B, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, BOTTOM_ROW, COL_C, steps))
                 {
+                    create_next_move(next, anthro, BOTTOM_ROW, COL_C, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, BOTTOM_ROW, COL_D, steps))
                 {
+                    create_next_move(next, anthro, BOTTOM_ROW, COL_D, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, TOP_ROW, COL_A, steps))
                 {
+                    create_next_move(next, anthro, TOP_ROW, COL_A, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, TOP_ROW, COL_B, steps))
                 {
+                    create_next_move(next, anthro, TOP_ROW, COL_B, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, TOP_ROW, COL_C, steps))
                 {
+                    create_next_move(next, anthro, TOP_ROW, COL_C, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
                 if (can_move(anthro, TOP_ROW, COL_D, steps))
                 {
+                    create_next_move(next, anthro, TOP_ROW, COL_D, steps);
+                    if (next.has_matching_parent())
+                    {
+                        cout << pad_str << " move blocked because of matching parent found " << endl;
+                    }
+                    else
+                    {
+                        moves.push_back(next);
+                    }
                 }
             }
         }
@@ -308,15 +452,40 @@ Move AocDay23::parse_input(string filename)
     
 }
 
+void AocDay23::find_best_move_depth_first_search(Move parent, int & lowest)
+{
+    string pad_str(parent.depth, ' ');
+    vector<Move> moves = parent.get_all_possible_moves();
+    
+    for (int i=0; i<moves.size(); i++)
+    {
+        //moves[i].board.display(moves[i].depth);
+        if (moves[i].is_final())
+        {
+            //cout << pad_str << "FINAL MOVE DETECTED with cost " << moves[i].cost << endl;
+            if (lowest == 0 || moves[i].cost < lowest)
+            {
+                lowest = moves[i].cost;
+                cout << pad_str << "*** NEW BEST COST ***" << lowest << endl;
+            }
+        }
+        else if (lowest == 0 || moves[i].cost < lowest)
+        {
+            find_best_move_depth_first_search(moves[i], lowest);
+        }
+    }
+}
+
 string AocDay23::part1(string filename, vector<string> extra_args)
 {
     Move move = parse_input(filename);
-    move.board.display(5);
+    move.board.display();
+    int lowest = 0;
     
-    vector<Move> moves = move.get_all_possible_moves();
+    find_best_move_depth_first_search(move, lowest);
     
     ostringstream out;
-    out << move.cost;
+    out << lowest;
     return out.str();
 }
 

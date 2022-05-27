@@ -57,6 +57,8 @@ namespace Day23
         bool is_final(int position);
         vector<Move> get_all_possible_moves();
         bool can_move(int position, int to_row, int to_col, int & steps);
+        void create_next_move(Move & next, int anthro, int to_row, int to_col, int steps);
+        bool has_matching_parent();
         Move * parent;
         
     };
@@ -68,6 +70,7 @@ class AocDay23 : public AocDay
 {
     private:
         Move parse_input(string filename);
+        void find_best_move_depth_first_search(Move parent, int & lowest);
     public:
         AocDay23();
         ~AocDay23();
