@@ -14,6 +14,97 @@ using namespace Day23;
 
 namespace Day23
 {
+    SmallBoard::SmallBoard()
+    {
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            m_layout[i][0]='\0';
+        }
+    }
+    
+    SmallBoard::SmallBoard(vector<string> input)
+    {
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            strncpy(m_layout[i], input[i].c_str(), ROW_WIDTH+1);
+        }
+    }
+    
+    SmallBoard::SmallBoard(const SmallBoard & other)
+    {
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            strncpy(m_layout[i], other.m_layout[i], ROW_WIDTH+1);
+        }
+    }
+    
+    SmallBoard::~SmallBoard()
+    {
+    }
+    
+    SmallBoard & SmallBoard::operator =(const SmallBoard & other)
+    {
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            strncpy(m_layout[i], other.m_layout[i], ROW_WIDTH+1);
+        }
+        return *this;
+    }
+    
+    bool SmallBoard::operator == (const SmallBoard & other)
+    {
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            if (strncmp(m_layout[i], other.m_layout[i], ROW_WIDTH) != 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    void SmallBoard::display()
+    {
+        display(0);
+    }
+    
+    void SmallBoard::display(int padding)
+    {
+        string pad_str(padding, ' ');
+        for (int i=0; i<NUM_SMALL_ROWS; i++)
+        {
+            cout << pad_str << m_layout[i] << endl;
+        }
+        cout << pad_str << "Representation string is " << get_representation() << endl;
+    }
+    
+    string SmallBoard::get_representation()
+    {
+        string rep(19, ' ');
+        map<pair<int, int>, int> index = AocDay23::get_smallboard_index();
+        for (map<pair<int, int>,int>::iterator it = index.begin(); it != index.end(); ++it)
+        {
+            rep[it->second]=m_layout[it->first.first][it->first.second];
+        }
+        return rep;
+    }
+    
+    SmallMove::SmallMove(SmallBoard * board, int depth)
+    {
+        m_board = board;
+        m_depth = depth;
+    }
+    
+    SmallMove::~SmallMove()
+    {
+    }
+    
+    bool SmallMove::is_final()
+    {
+        return (m_board->get_representation() == FINAL_SMALL_REP);
+    }
+    
+    
     void Board::display()
     {
         display(0);
@@ -369,6 +460,7 @@ namespace Day23
 
 AocDay23::AocDay23():AocDay(23)
 {
+    set_up_indices();
 }
 
 AocDay23::~AocDay23()
@@ -447,9 +539,11 @@ Move AocDay23::parse_input(string filename)
     move.cost = 0;
     move.parent = NULL;
     move.board.display();
-    return move;
-    
-    
+
+    SmallBoard board(lines);
+    board.display();
+
+    return move;    
 }
 
 void AocDay23::find_best_move_depth_first_search(Move parent, int & lowest)
@@ -489,3 +583,32 @@ string AocDay23::part1(string filename, vector<string> extra_args)
     return out.str();
 }
 
+map<pair<int, int>, int> AocDay23::m_smallboard_index;
+
+map<pair<int, int>, int> AocDay23::get_smallboard_index()
+{
+    return m_smallboard_index;
+}
+
+void AocDay23::set_up_indices()
+{
+    m_smallboard_index[make_pair(HALLWAY_ROW,1)] = 0;
+    m_smallboard_index[make_pair(HALLWAY_ROW,2)] = 1;
+    m_smallboard_index[make_pair(HALLWAY_ROW,3)] = 2;
+    m_smallboard_index[make_pair(HALLWAY_ROW,4)] = 3;
+    m_smallboard_index[make_pair(HALLWAY_ROW,5)] = 4;
+    m_smallboard_index[make_pair(HALLWAY_ROW,6)] = 5;
+    m_smallboard_index[make_pair(HALLWAY_ROW,7)] = 6;
+    m_smallboard_index[make_pair(HALLWAY_ROW,8)] = 7;
+    m_smallboard_index[make_pair(HALLWAY_ROW,9)] = 8;
+    m_smallboard_index[make_pair(HALLWAY_ROW,10)] = 9;
+    m_smallboard_index[make_pair(HALLWAY_ROW,11)] = 10;
+    m_smallboard_index[make_pair(2,COL_A)] = 11;
+    m_smallboard_index[make_pair(2,COL_B)] = 12;
+    m_smallboard_index[make_pair(2,COL_C)] = 13;
+    m_smallboard_index[make_pair(2,COL_D)] = 14;
+    m_smallboard_index[make_pair(3,COL_A)] = 15;
+    m_smallboard_index[make_pair(3,COL_B)] = 16;
+    m_smallboard_index[make_pair(3,COL_C)] = 17;
+    m_smallboard_index[make_pair(3,COL_D)] = 18;
+}

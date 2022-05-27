@@ -27,18 +27,54 @@
 #define COL_HALLWAY_LEFT 1
 #define COL_HALLWAY_RIGHT 11
 
-#define BOTTOM_ROW 3
-#define TOP_ROW 2
 #define HALLWAY_ROW 1
+#define TOP_ROW 2
+#define BOTTOM_ROW 3
+#define NUM_SMALL_ROWS 5
+
+#define FINAL_SMALL_REP "...........ABCDABCD"
+
+#define ROW_WIDTH 13
 
 namespace Day23
 {
+    class SmallBoard
+    {
+        private:
+            char m_layout[NUM_SMALL_ROWS][ROW_WIDTH+1];
+        public:
+            SmallBoard();
+            SmallBoard(vector<string> input); // takes the five lines of input
+            SmallBoard(const SmallBoard & other);
+            SmallBoard& operator=(const SmallBoard & other);
+            bool operator==(const SmallBoard & other);
+            ~SmallBoard();
+            string get_representation();
+            void display();
+            void display(int padding);
+            
+    };
+    
+    class SmallMove
+    {
+        private:
+            SmallBoard * m_board;
+            int m_depth;
+        public:
+            SmallMove(SmallBoard * board, int depth);
+            ~SmallMove();
+            bool is_final();
+    };
+            
+    
     struct Board
     {
         char layout[5][14];
         void display();
         void display(int padding);
     };
+    
+    
     
     struct Position
     {
@@ -71,9 +107,13 @@ class AocDay23 : public AocDay
     private:
         Move parse_input(string filename);
         void find_best_move_depth_first_search(Move parent, int & lowest);
+        static map<pair<int, int>, int> m_smallboard_index;
+        map<int, pair<int, int>> m_smallboard_reverse_index;
+        void set_up_indices();
     public:
         AocDay23();
         ~AocDay23();
+        static map<pair<int, int>, int> get_smallboard_index();
         string part1(string filename, vector<string> extra_args);
         //string part2(string filename, vector<string> extra_args);
 };
