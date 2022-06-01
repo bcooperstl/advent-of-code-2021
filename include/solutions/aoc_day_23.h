@@ -16,7 +16,7 @@
 
 #define NUM_ANTHRO_TYPES 4
 
-#define NUM_ANTHROS 8
+#define NUM_SMALL_ANTHROS 8
 
 #define COST_A 1
 #define COST_B 10
@@ -41,6 +41,12 @@
 
 #define ROW_WIDTH 13
 
+#define MOVE_TYPE_COL_TO_COL 0
+#define MOVE_TYPE_HALL_TO_COL 1
+#define MOVE_TYPE_COL_TO_HALL 2
+
+#define NUM_MOVE_TYPES 3
+
 namespace Day23
 {
     class Board
@@ -55,6 +61,7 @@ namespace Day23
             virtual void set(int row, int col, char ch) = 0;
             virtual bool is_final(int row, int col) = 0;
             virtual Board * clone() = 0;
+            virtual int get_num_final() = 0;
     };
     
     class SmallBoard : public Board
@@ -75,6 +82,7 @@ namespace Day23
             virtual void set(int row, int col, char value);
             virtual bool is_final(int row, int col);
             virtual Board * clone();
+            virtual int get_num_final();
     };
     
     struct Move
@@ -96,18 +104,19 @@ namespace Day23
         public:
             MoveIndex();
             virtual ~MoveIndex();
-            virtual vector<Move> get_moves(char anthro, int row, int col) = 0;
+            virtual vector<Move> get_moves(int move_type, char anthro, int row, int col) = 0;
             virtual void add_move(Move move) = 0;
     };
     
     class SmallMoveIndex : public MoveIndex
     {
         private:
-            vector<Move> m_moves[NUM_ANTHRO_TYPES][SMALL_REP_STR_LENGTH];
+            int m_lookup[NUM_SMALL_ROWS][ROW_WIDTH];
+            vector<Move> m_moves[NUM_MOVE_TYPES][NUM_ANTHRO_TYPES][SMALL_REP_STR_LENGTH];
         public:
             SmallMoveIndex();
             virtual ~SmallMoveIndex();
-            virtual vector<Move> get_moves(char anthro, int row, int col);
+            virtual vector<Move> get_moves(int move_type, char anthro, int row, int col);
             void add_move(Move move);
     };
     
@@ -117,6 +126,7 @@ namespace Day23
             Board * m_board;
             int m_cost;
             bool m_worked;
+            int m_num_final;
         public:
             Position(Board * board, int cost);
             virtual ~Position();
@@ -127,6 +137,8 @@ namespace Day23
             void update_cost(int cost);
             Board * get_board();
             virtual Position * create(Board * board, int cost) = 0; // this is so ugly
+            void set_num_final(int num_final);
+            int get_num_final();
     };
     
     class SmallPosition : public Position
