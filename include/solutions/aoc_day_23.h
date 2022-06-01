@@ -43,7 +43,17 @@
 
 namespace Day23
 {
-    class SmallBoard
+    class Board
+    {
+        public:
+            Board();
+            virtual ~Board();
+            virtual void display() = 0;
+            virtual void display(int padding) = 0;
+            virtual string get_representation() = 0;
+    };
+    
+    class SmallBoard : public Board
     {
         private:
             char m_layout[NUM_SMALL_ROWS][ROW_WIDTH+1];
@@ -53,11 +63,10 @@ namespace Day23
             SmallBoard(const SmallBoard & other);
             SmallBoard& operator=(const SmallBoard & other);
             bool operator==(const SmallBoard & other);
-            ~SmallBoard();
-            string get_representation();
-            void display();
-            void display(int padding);
-            
+            virtual ~SmallBoard();
+            virtual string get_representation();
+            virtual void display();
+            virtual void display(int padding);
     };
     
     struct Move
@@ -94,19 +103,29 @@ namespace Day23
             void add_move(Move move);
     };
     
-    class SmallMove
+    class Position
     {
-        private:
-            SmallBoard * m_board;
+        protected:
+            Board * m_board;
             int m_cost;
             bool m_worked;
         public:
-            SmallMove(SmallBoard * board, int cost);
-            ~SmallMove();
-            bool is_final();
+            Position(Board * board, int cost);
+            virtual ~Position();
+            virtual bool is_final() = 0;
             bool is_worked();
+            void set_worked(bool worked);
             int get_cost();
             void update_cost(int cost);
+    };
+        
+    class SmallPosition : public Position
+    {
+        private:
+        public:
+            SmallPosition(SmallBoard * board, int cost);
+            virtual ~SmallPosition();
+            virtual bool is_final();
     };
     
 }

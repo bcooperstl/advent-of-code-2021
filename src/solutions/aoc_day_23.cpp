@@ -14,6 +14,14 @@ using namespace Day23;
 
 namespace Day23
 {
+    Board::Board()
+    {
+    }
+    
+    Board::~Board()
+    {
+    }
+    
     SmallBoard::SmallBoard()
     {
         for (int i=0; i<NUM_SMALL_ROWS; i++)
@@ -120,6 +128,54 @@ namespace Day23
              << " to " << move.to_row << "," << move.to_col 
              << " with " << move.steps << " steps and " << move.cost << " cost" 
              << " and mask set to [" << move.move_mask << "]" << endl;
+    }
+    
+    Position::Position(Board * board, int cost)
+    {
+        m_board = board;
+        m_cost = cost;
+        m_worked = false;
+    }
+    
+    Position::~Position()
+    {
+    }
+    
+    bool Position::is_worked()
+    {
+        return m_worked;
+    }
+    
+    void Position::set_worked(bool worked)
+    {
+        m_worked = worked;
+    }
+    
+    int Position::get_cost()
+    {
+        return m_cost;
+    }
+    
+    void Position::update_cost(int cost)
+    {
+        m_cost = cost;
+        if (cost > m_cost)
+        {
+            cout << "WARNING...raising cost...you probably don't want to do this" << endl;
+        }
+    }
+    
+    SmallPosition::SmallPosition(SmallBoard * board, int cost):Position(board, cost)
+    {
+    }
+    
+    SmallPosition::~SmallPosition()
+    {
+    }
+    
+    bool SmallPosition::is_final()
+    {
+        return (m_board->get_representation() == FINAL_SMALL_REP);
     }
     
 };
