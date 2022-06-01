@@ -12,6 +12,10 @@
 #define ANTHRO_D 'D'
 #define OPEN '.'
 
+#define ANTHRO_ALL 'X'
+
+#define NUM_ANTHRO_TYPES 4
+
 #define NUM_ANTHROS 8
 
 #define COST_A 1
@@ -56,6 +60,40 @@ namespace Day23
             
     };
     
+    struct Move
+    {
+        char anthro;
+        int from_row;
+        int from_col;
+        int to_row;
+        int to_col;
+        int steps;
+        int cost;
+        string move_mask;
+    };
+    
+    
+    class MoveIndex
+    {
+        private:
+        public:
+            MoveIndex();
+            virtual ~MoveIndex();
+            virtual vector<Move> get_moves(char anthro, int row, int col) = 0;
+            virtual void add_move(Move move) = 0;
+    };
+    
+    class SmallMoveIndex : public MoveIndex
+    {
+        private:
+            vector<Move> m_moves[NUM_ANTHRO_TYPES][SMALL_REP_STR_LENGTH];
+        public:
+            SmallMoveIndex();
+            virtual ~SmallMoveIndex();
+            virtual vector<Move> get_moves(char anthro, int row, int col);
+            void add_move(Move move);
+    };
+    
     class SmallMove
     {
         private:
@@ -71,46 +109,6 @@ namespace Day23
             void update_cost(int cost);
     };
     
-    struct AnthroMove
-    {
-        char anthro;
-        int from_rep;
-        int to_rep;
-        int steps;
-        AnthroMove(char a, int f, int t, int s);
-    };
-    
-    struct Board
-    {
-        char layout[5][14];
-        void display();
-        void display(int padding);
-    };
-    
-    
-    
-    struct Position
-    {
-        int row;
-        int col;
-        char anthro;
-    };
-    
-    struct Move
-    {
-        int depth;
-        int cost;
-        Position positions[NUM_ANTHROS];
-        Board board;
-        bool is_final();
-        bool is_final(int position);
-        vector<Move> get_all_possible_moves();
-        bool can_move(int position, int to_row, int to_col, int & steps);
-        void create_next_move(Move & next, int anthro, int to_row, int to_col, int steps);
-        bool has_matching_parent();
-        Move * parent;
-        
-    };
 }
 
 using namespace Day23;
@@ -118,17 +116,19 @@ using namespace Day23;
 class AocDay23 : public AocDay
 {
     private:
-        void parse_input(string filename, Move & move, SmallBoard & small_board);
-        void find_best_move_depth_first_search(Move parent, int & lowest);
+        void parse_input(string filename, SmallBoard & small_board);
+        void parse_moveindex(string filename, MoveIndex & index, int move_mask_length);
         static map<pair<int, int>, int> m_smallboard_index;
-        map<int, pair<int, int>> m_smallboard_reverse_index;
+        static map<int, pair<int, int>> m_smallboard_reverse_index;
         void set_up_indices();
     public:
         AocDay23();
         ~AocDay23();
         static map<pair<int, int>, int> get_smallboard_index();
+        static map<int, pair<int, int>> get_smallboard_reverse_index();
         string part1(string filename, vector<string> extra_args);
         //string part2(string filename, vector<string> extra_args);
 };
 
 #endif
+
