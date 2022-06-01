@@ -412,9 +412,15 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
     while (position != NULL)
     {
         Board * board = position->get_board();
-        cout << "Working position with cost " << position->get_cost() << " and board " << endl;
-        board->display();
+        if (position->is_final()) // no need to go further
+        {
+            return;
+        }
+        //board->display();
         string rep = board->get_representation();
+        cout << "Working position with cost " << position->get_cost() << " and board " << rep << endl;
+        if (position->get_cost() > 5000)
+            return;
         
         map<int, pair<int, int>>::iterator loca_pos = location_index.begin();
         while (loca_pos != location_index.end())
@@ -424,24 +430,24 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
             char at = board->get(row, col);
             if (at == OPEN)
             {
-                cout << " Nothing to move at open location " << row << "," << col << endl;
+                //cout << " Nothing to move at open location " << row << "," << col << endl;
             }
             else if (board->is_final(row, col))
             {
-                cout << " Anthro " << at << " at location " << row << "," << col << " is at final location" << endl;
+                //cout << " Anthro " << at << " at location " << row << "," << col << " is at final location" << endl;
             }
             else
             {
-                cout << " Looking for moves for " << at << " at " << row << "," << col << endl;
+                //cout << " Looking for moves for " << at << " at " << row << "," << col << endl;
                 vector<Move> moves = index.get_moves(at, row, col);
                 vector<Move>::iterator move_iter = moves.begin();
                 while (move_iter != moves.end())
                 {
                     Move move = *move_iter;
-                    cout << " Checking move from " << move.from_row << "," << move.from_col << " to " << move.to_row << "," << move.to_col << endl;
+                    //cout << " Checking move from " << move.from_row << "," << move.from_col << " to " << move.to_row << "," << move.to_col << endl;
                     if (board->get(move.to_row, move.to_col) != OPEN)
                     {
-                        cout << "  Ending location is not open. skipping move" << endl;
+                        //cout << "  Ending location is not open. skipping move" << endl;
                     }
                     else
                     {
@@ -451,7 +457,7 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
                         {
                             if (move.move_mask[i] != ' ' && move.move_mask[i] != rep[i])
                             {
-                                cout << "  Mask mismatch at position " << i << " makes move invalid. skipping move." << endl;
+                                //cout << "  Mask mismatch at position " << i << " makes move invalid. skipping move." << endl;
                                 match = false;
                             }
                         }
@@ -463,13 +469,13 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
                             int next_cost = position->get_cost() + move.cost;
                             string next_rep = next_board->get_representation();
                             
-                            cout << "  This is a potential move to add with cost " << next_cost << " and board " <<endl;
-                            next_board->display(2);
+                            //cout << "  This is a potential move to add with cost " << next_cost << " and board " <<endl;
+                            //next_board->display(2);
                             
                             Position * found_position = positions.find(next_rep);
                             if (found_position == NULL)
                             {
-                                cout << "   New position to be added" << endl;
+                                //cout << "   New position to be added" << endl;
                                 Position * next_position = position->create(next_board, next_cost);
                                 positions.add(next_position);
                             }
@@ -477,12 +483,12 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
                             {
                                 if (next_cost < found_position->get_cost())
                                 {
-                                    cout << "   Lower cost of " << next_cost << " is better than existing cost " << found_position->get_cost() << endl;
+                                    //cout << "   Lower cost of " << next_cost << " is better than existing cost " << found_position->get_cost() << endl;
                                     found_position->update_cost(next_cost);
                                 }
                                 else
                                 {
-                                    cout << "   Existing position has better cost of " << found_position->get_cost() << endl;
+                                    //cout << "   Existing position has better cost of " << found_position->get_cost() << endl;
                                 }
                                 delete next_board;
                             }
