@@ -135,6 +135,11 @@ namespace Day23
         return false;
     }
     
+    Board * SmallBoard::clone()
+    {
+        return new SmallBoard(*this);
+    }
+    
     MoveIndex::MoveIndex()
     {
     }
@@ -222,6 +227,11 @@ namespace Day23
         return (m_board->get_representation() == FINAL_SMALL_REP);
     }
     
+    Position * SmallPosition::create(Board * board, int cost)
+    {
+        return new SmallPosition((SmallBoard *)board, cost);
+    }
+    
     Positions::Positions()
     {
     }
@@ -287,6 +297,7 @@ namespace Day23
         }
         return best;
     }
+    
     
 };
 
@@ -446,7 +457,35 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
                         }
                         if (match == true)
                         {
-                            cout << "  This is a potential move to add" << endl;
+                            Board * next_board = board->clone();
+                            next_board->set(move.from_row, move.from_col, OPEN);
+                            next_board->set(move.to_row, move.to_col, move.anthro);
+                            int next_cost = position->get_cost() + move.cost;
+                            string next_rep = next_board->get_representation();
+                            
+                            cout << "  This is a potential move to add with cost " << next_cost << " and board " <<endl;
+                            next_board->display(2);
+                            
+                            Position * found_position = positions.find(next_rep);
+                            if (found_position == NULL)
+                            {
+                                cout << "   New position to be added" << endl;
+                                Position * next_position = position->create(next_board, next_cost);
+                                positions.add(next_position);
+                            }
+                            else
+                            {
+                                if (next_cost < found_position->get_cost())
+                                {
+                                    cout << "   Lower cost of " << next_cost << " is better than existing cost " << found_position->get_cost() << endl;
+                                    found_position->update_cost(next_cost);
+                                }
+                                else
+                                {
+                                    cout << "   Existing position has better cost of " << found_position->get_cost() << endl;
+                                }
+                                delete next_board;
+                            }
                         }
                     }
                     ++move_iter;

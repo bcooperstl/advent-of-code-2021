@@ -54,6 +54,7 @@ namespace Day23
             virtual char get(int row, int col) = 0;
             virtual void set(int row, int col, char ch) = 0;
             virtual bool is_final(int row, int col) = 0;
+            virtual Board * clone() = 0;
     };
     
     class SmallBoard : public Board
@@ -73,6 +74,7 @@ namespace Day23
             virtual char get(int row, int col);
             virtual void set(int row, int col, char value);
             virtual bool is_final(int row, int col);
+            virtual Board * clone();
     };
     
     struct Move
@@ -124,6 +126,7 @@ namespace Day23
             int get_cost();
             void update_cost(int cost);
             Board * get_board();
+            virtual Position * create(Board * board, int cost) = 0; // this is so ugly
     };
     
     class SmallPosition : public Position
@@ -133,6 +136,7 @@ namespace Day23
             SmallPosition(SmallBoard * board, int cost);
             virtual ~SmallPosition();
             virtual bool is_final();
+            virtual Position * create(Board * board, int cost);
     };
     
     class Positions
