@@ -97,6 +97,44 @@ namespace Day23
         return rep;
     }
     
+    char SmallBoard::get(int row, int col)
+    {
+        return m_layout[row][col];
+    }
+    
+    void SmallBoard::set(int row, int col, char value)
+    {
+        m_layout[row][col] = value;
+    }
+    
+    bool SmallBoard::is_final(int row, int col)
+    {
+        // never final on landing row. doesn't really make sense anyways
+        if (row == HALLWAY_ROW)
+        {
+            return false;
+        }
+        
+        // final on bottom row if the anthro matches its column
+        if (row == SMALL_BOTTOM_ROW)
+        {
+            return ((col == COL_A && m_layout[row][col] == ANTHRO_A) ||
+                    (col == COL_B && m_layout[row][col] == ANTHRO_B) ||
+                    (col == COL_C && m_layout[row][col] == ANTHRO_C) ||
+                    (col == COL_D && m_layout[row][col] == ANTHRO_D));
+        }
+        else // row is top row in the column. need it and the bottom to match. need this to move a matching one out of the column to get a non-matching one below it out
+        {
+            return ((col == COL_A && m_layout[row][col] == ANTHRO_A && m_layout[SMALL_BOTTOM_ROW][col] == ANTHRO_A) ||
+                    (col == COL_B && m_layout[row][col] == ANTHRO_B && m_layout[SMALL_BOTTOM_ROW][col] == ANTHRO_B) ||
+                    (col == COL_C && m_layout[row][col] == ANTHRO_C && m_layout[SMALL_BOTTOM_ROW][col] == ANTHRO_C) ||
+                    (col == COL_D && m_layout[row][col] == ANTHRO_D && m_layout[SMALL_BOTTOM_ROW][col] == ANTHRO_D));
+        }
+        
+        // should not get here
+        return false;
+    }
+    
     MoveIndex::MoveIndex()
     {
     }
@@ -139,6 +177,7 @@ namespace Day23
     
     Position::~Position()
     {
+        delete m_board;
     }
     
     bool Position::is_worked()
@@ -165,6 +204,11 @@ namespace Day23
         }
     }
     
+    Board * Position::get_board()
+    {
+        return m_board;
+    }
+    
     SmallPosition::SmallPosition(SmallBoard * board, int cost):Position(board, cost)
     {
     }
@@ -176,6 +220,72 @@ namespace Day23
     bool SmallPosition::is_final()
     {
         return (m_board->get_representation() == FINAL_SMALL_REP);
+    }
+    
+    Positions::Positions()
+    {
+    }
+    
+    Positions::~Positions()
+    {
+        map<string, Position*>::iterator pos = m_position_map.begin();
+        while (pos != m_position_map.end())
+        {
+            delete pos->second;
+            ++pos;
+        }
+    }
+    
+    Position * Positions::get_final_position()
+    {
+        map<string, Position *>::iterator pos = m_position_map.begin();
+        while (pos != m_position_map.end())
+        {
+            if (pos->second->is_final())
+            {
+                return pos->second;
+            }
+            ++pos;
+        }
+        return NULL;
+    }
+    
+    Position * Positions::find(string input)
+    {
+        map<string, Position *>::iterator found = m_position_map.find(input);
+        if (found != m_position_map.end())
+        {
+            return found->second;
+        }
+        return NULL;
+    }
+    
+    void Positions::add(Position * position)
+    {
+        m_position_map[position->get_board()->get_representation()] = position;
+    }
+    
+    Position * Positions::get_next_position_to_work()
+    {
+        // return the unworked position with the lowest cost
+        Position * best = NULL;
+        map<string, Position *>::iterator pos = m_position_map.begin();
+        while (pos != m_position_map.end())
+        {
+            if (!pos->second->is_worked())
+            {
+                if (best == NULL)
+                {
+                    best = pos->second;
+                }
+                else if (pos->second->get_cost() < best->get_cost())
+                {
+                    best = pos->second;
+                }
+            }
+            ++pos;
+        }
+        return best;
     }
     
 };
@@ -285,6 +395,73 @@ void AocDay23::parse_moveindex(string filename, MoveIndex & index, int move_mask
     }
 }
 
+void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int, pair<int, int>> location_index)
+{
+    Position * position = positions.get_next_position_to_work();
+    while (position != NULL)
+    {
+        Board * board = position->get_board();
+        cout << "Working position with cost " << position->get_cost() << " and board " << endl;
+        board->display();
+        string rep = board->get_representation();
+        
+        map<int, pair<int, int>>::iterator loca_pos = location_index.begin();
+        while (loca_pos != location_index.end())
+        {
+            int row = loca_pos->second.first;
+            int col = loca_pos->second.second;
+            char at = board->get(row, col);
+            if (at == OPEN)
+            {
+                cout << " Nothing to move at open location " << row << "," << col << endl;
+            }
+            else if (board->is_final(row, col))
+            {
+                cout << " Anthro " << at << " at location " << row << "," << col << " is at final location" << endl;
+            }
+            else
+            {
+                cout << " Looking for moves for " << at << " at " << row << "," << col << endl;
+                vector<Move> moves = index.get_moves(at, row, col);
+                vector<Move>::iterator move_iter = moves.begin();
+                while (move_iter != moves.end())
+                {
+                    Move move = *move_iter;
+                    cout << " Checking move from " << move.from_row << "," << move.from_col << " to " << move.to_row << "," << move.to_col << endl;
+                    if (board->get(move.to_row, move.to_col) != OPEN)
+                    {
+                        cout << "  Ending location is not open. skipping move" << endl;
+                    }
+                    else
+                    {
+                        bool match = true;
+                        // check if mask matches
+                        for (int i=0; i<move.move_mask.length(); i++)
+                        {
+                            if (move.move_mask[i] != ' ' && move.move_mask[i] != rep[i])
+                            {
+                                cout << "  Mask mismatch at position " << i << " makes move invalid. skipping move." << endl;
+                                match = false;
+                            }
+                        }
+                        if (match == true)
+                        {
+                            cout << "  This is a potential move to add" << endl;
+                        }
+                    }
+                    ++move_iter;
+                }
+            }
+            ++loca_pos;
+        }
+        
+        
+        position->set_worked(true);
+        position = positions.get_next_position_to_work();
+    }
+    
+};
+
 string AocDay23::part1(string filename, vector<string> extra_args)
 {
     SmallBoard small_board;
@@ -294,10 +471,24 @@ string AocDay23::part1(string filename, vector<string> extra_args)
     SmallMoveIndex index;
     parse_moveindex("data/day23_smallmoves.txt", index, SMALL_REP_STR_LENGTH);
     
-    int lowest = 0;
+    Positions positions;
+    
+    Position * start_position = new SmallPosition(new SmallBoard(small_board), 0);
+    positions.add(start_position);
+    
+    work_positions(index, positions, m_smallboard_reverse_index);
+    
+    Position * final = positions.get_final_position();
     
     ostringstream out;
-    out << lowest;
+    if (final != NULL)
+    {
+        out << final->get_cost();
+    }
+    else
+    {
+        out << "";
+    }
     return out.str();
 }
 

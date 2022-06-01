@@ -32,8 +32,8 @@
 #define COL_HALLWAY_RIGHT 11
 
 #define HALLWAY_ROW 1
-#define TOP_ROW 2
-#define BOTTOM_ROW 3
+#define SMALL_TOP_ROW 2
+#define SMALL_BOTTOM_ROW 3
 #define NUM_SMALL_ROWS 5
 
 #define FINAL_SMALL_REP "...........ABCDABCD"
@@ -51,6 +51,9 @@ namespace Day23
             virtual void display() = 0;
             virtual void display(int padding) = 0;
             virtual string get_representation() = 0;
+            virtual char get(int row, int col) = 0;
+            virtual void set(int row, int col, char ch) = 0;
+            virtual bool is_final(int row, int col) = 0;
     };
     
     class SmallBoard : public Board
@@ -67,6 +70,9 @@ namespace Day23
             virtual string get_representation();
             virtual void display();
             virtual void display(int padding);
+            virtual char get(int row, int col);
+            virtual void set(int row, int col, char value);
+            virtual bool is_final(int row, int col);
     };
     
     struct Move
@@ -117,8 +123,9 @@ namespace Day23
             void set_worked(bool worked);
             int get_cost();
             void update_cost(int cost);
+            Board * get_board();
     };
-        
+    
     class SmallPosition : public Position
     {
         private:
@@ -126,6 +133,19 @@ namespace Day23
             SmallPosition(SmallBoard * board, int cost);
             virtual ~SmallPosition();
             virtual bool is_final();
+    };
+    
+    class Positions
+    {
+        private:
+            map<string, Position *> m_position_map;
+        public:
+            Positions();
+            ~Positions();
+            Position * get_final_position();
+            Position * find(string input);
+            void add(Position * position);
+            Position * get_next_position_to_work();
     };
     
 }
@@ -140,6 +160,7 @@ class AocDay23 : public AocDay
         static map<pair<int, int>, int> m_smallboard_index;
         static map<int, pair<int, int>> m_smallboard_reverse_index;
         void set_up_indices();
+        void work_positions(MoveIndex & index, Positions & positions, map<int, pair<int, int>> locaiton_index);
     public:
         AocDay23();
         ~AocDay23();
