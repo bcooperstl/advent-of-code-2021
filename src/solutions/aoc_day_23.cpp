@@ -419,85 +419,98 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
         //board->display();
         string rep = board->get_representation();
         cout << "Working position with cost " << position->get_cost() << " and board " << rep << endl;
-        if (position->get_cost() > 5000)
-            return;
         
         map<int, pair<int, int>>::iterator loca_pos = location_index.begin();
+        bool first_loop_through = true;
+        bool did_move = false;
+        // first loop through, look for at pieces moving from the top row to the bottom row
         while (loca_pos != location_index.end())
         {
             int row = loca_pos->second.first;
             int col = loca_pos->second.second;
             char at = board->get(row, col);
-            if (at == OPEN)
+            if ((first_loop_through && row == HALLWAY_ROW) || ((!first_loop_through) && (row != HALLWAY_ROW)))
             {
-                //cout << " Nothing to move at open location " << row << "," << col << endl;
-            }
-            else if (board->is_final(row, col))
-            {
-                //cout << " Anthro " << at << " at location " << row << "," << col << " is at final location" << endl;
-            }
-            else
-            {
-                //cout << " Looking for moves for " << at << " at " << row << "," << col << endl;
-                vector<Move> moves = index.get_moves(at, row, col);
-                vector<Move>::iterator move_iter = moves.begin();
-                while (move_iter != moves.end())
+                if (at == OPEN)
                 {
-                    Move move = *move_iter;
-                    //cout << " Checking move from " << move.from_row << "," << move.from_col << " to " << move.to_row << "," << move.to_col << endl;
-                    if (board->get(move.to_row, move.to_col) != OPEN)
+                    //cout << " Nothing to move at open location " << row << "," << col << endl;
+                }
+                else if (board->is_final(row, col))
+                {
+                    //cout << " Anthro " << at << " at location " << row << "," << col << " is at final location" << endl;
+                }
+                else
+                {
+                    //cout << " Looking for moves for " << at << " at " << row << "," << col << endl;
+                    vector<Move> moves = index.get_moves(at, row, col);
+                    vector<Move>::iterator move_iter = moves.begin();
+                    bool any_moves_to_final = false;
+                    
+                    while (move_iter != moves.end())
                     {
-                        //cout << "  Ending location is not open. skipping move" << endl;
-                    }
-                    else
-                    {
-                        bool match = true;
-                        // check if mask matches
-                        for (int i=0; i<move.move_mask.length(); i++)
+                        Move move = *move_iter;
+                        //cout << " Checking move from " << move.from_row << "," << move.from_col << " to " << move.to_row << "," << move.to_col << endl;
+                        if (board->get(move.to_row, move.to_col) != OPEN)
                         {
-                            if (move.move_mask[i] != ' ' && move.move_mask[i] != rep[i])
-                            {
-                                //cout << "  Mask mismatch at position " << i << " makes move invalid. skipping move." << endl;
-                                match = false;
-                            }
+                            //cout << "  Ending location is not open. skipping move" << endl;
                         }
-                        if (match == true)
+                        else
                         {
-                            Board * next_board = board->clone();
-                            next_board->set(move.from_row, move.from_col, OPEN);
-                            next_board->set(move.to_row, move.to_col, move.anthro);
-                            int next_cost = position->get_cost() + move.cost;
-                            string next_rep = next_board->get_representation();
-                            
-                            //cout << "  This is a potential move to add with cost " << next_cost << " and board " <<endl;
-                            //next_board->display(2);
-                            
-                            Position * found_position = positions.find(next_rep);
-                            if (found_position == NULL)
+                            bool match = true;
+                            // check if mask matches
+                            for (int i=0; i<move.move_mask.length(); i++)
                             {
-                                //cout << "   New position to be added" << endl;
-                                Position * next_position = position->create(next_board, next_cost);
-                                positions.add(next_position);
-                            }
-                            else
-                            {
-                                if (next_cost < found_position->get_cost())
+                                if (move.move_mask[i] != ' ' && move.move_mask[i] != rep[i])
                                 {
-                                    //cout << "   Lower cost of " << next_cost << " is better than existing cost " << found_position->get_cost() << endl;
-                                    found_position->update_cost(next_cost);
+                                    //cout << "  Mask mismatch at position " << i << " makes move invalid. skipping move." << endl;
+                                    match = false;
+                                }
+                            }
+                            if (match == true)
+                            {
+                                Board * next_board = board->clone();
+                                next_board->set(move.from_row, move.from_col, OPEN);
+                                next_board->set(move.to_row, move.to_col, move.anthro);
+                                int next_cost = position->get_cost() + move.cost;
+                                string next_rep = next_board->get_representation();
+                                
+                                //cout << "  This is a potential move to add with cost " << next_cost << " and board " <<endl;
+                                //next_board->display(2);
+                                
+                                Position * found_position = positions.find(next_rep);
+                                if (found_position == NULL)
+                                {
+                                    //cout << "   New position to be added" << endl;
+                                    Position * next_position = position->create(next_board, next_cost);
+                                    positions.add(next_position);
+                                    did_move = true;
                                 }
                                 else
                                 {
-                                    //cout << "   Existing position has better cost of " << found_position->get_cost() << endl;
+                                    if (next_cost < found_position->get_cost())
+                                    {
+                                        //cout << "   Lower cost of " << next_cost << " is better than existing cost " << found_position->get_cost() << endl;
+                                        found_position->update_cost(next_cost);
+                                        did_move = true;
+                                    }
+                                    else
+                                    {
+                                        //cout << "   Existing position has better cost of " << found_position->get_cost() << endl;
+                                    }
+                                    delete next_board;
                                 }
-                                delete next_board;
                             }
                         }
+                        ++move_iter;
                     }
-                    ++move_iter;
                 }
             }
             ++loca_pos;
+            if (first_loop_through && loca_pos == location_index.end() && (!did_move))
+            {
+                loca_pos = location_index.begin();
+                first_loop_through = false;
+            }
         }
         
         
