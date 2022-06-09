@@ -735,7 +735,7 @@ void AocDay23::parse_input_large(string filename, LargeBoard & large_board)
     large_board = LargeBoard(lines);
 }
 
-void AocDay23::parse_moveindex(string filename, MoveIndex & index, int move_mask_length)
+void AocDay23::parse_moveindex(string filename, MoveIndex & index, int move_mask_length, map<int, pair<int, int>> reverse_index)
 {
 /*
 !Format is Anthro|Start Location|End Location|Requirements
@@ -759,10 +759,10 @@ void AocDay23::parse_moveindex(string filename, MoveIndex & index, int move_mask
     {
         Move move;
         move.anthro = moves[i][0][0]; // get the first char
-        pair<int, int> from = m_smallboard_reverse_index[strtol(moves[i][1].c_str(), NULL, 10)];
+        pair<int, int> from = reverse_index[strtol(moves[i][1].c_str(), NULL, 10)];
         move.from_row = from.first;
         move.from_col = from.second;
-        pair<int, int> to = m_smallboard_reverse_index[strtol(moves[i][2].c_str(), NULL, 10)];
+        pair<int, int> to = reverse_index[strtol(moves[i][2].c_str(), NULL, 10)];
         move.to_row = to.first;
         move.to_col = to.second;
         move.steps = abs(move.from_row - HALLWAY_ROW) + abs(move.to_row - HALLWAY_ROW) + abs(move.from_col - move.to_col);
@@ -1091,7 +1091,7 @@ string AocDay23::part1(string filename, vector<string> extra_args)
     small_board.display();
     
     SmallMoveIndex index;
-    parse_moveindex("data/day23_smallmoves.txt", index, SMALL_REP_STR_LENGTH);
+    parse_moveindex("data/day23_smallmoves.txt", index, SMALL_REP_STR_LENGTH, m_smallboard_reverse_index);
     
     Positions positions;
     
@@ -1121,7 +1121,7 @@ string AocDay23::part2(string filename, vector<string> extra_args)
     large_board.display();
     
     LargeMoveIndex index;
-    parse_moveindex("data/day23_largemoves.txt", index, LARGE_REP_STR_LENGTH);
+    parse_moveindex("data/day23_largemoves.txt", index, LARGE_REP_STR_LENGTH, m_largeboard_reverse_index);
     
     Positions positions;
     

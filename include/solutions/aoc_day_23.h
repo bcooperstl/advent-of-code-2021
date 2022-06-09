@@ -229,7 +229,7 @@ class AocDay23 : public AocDay
     private:
         void parse_input_small(string filename, SmallBoard & small_board);
         void parse_input_large(string filename, LargeBoard & large_board);
-        void parse_moveindex(string filename, MoveIndex & index, int move_mask_length);
+        void parse_moveindex(string filename, MoveIndex & index, int move_mask_length, map<int, pair<int, int>> reverse_index);
         static map<pair<int, int>, int> m_smallboard_index;
         static map<int, pair<int, int>> m_smallboard_reverse_index;
         static map<pair<int, int>, int> m_largeboard_index;
