@@ -147,4 +147,5 @@
 22,2,day22_input.txt,1206644425246111
 23,1,test_cases/day23_test1.txt,12521
 23,1,day23_input.txt,16300
-23,2,test_cases/day23_test1.txt,44169
+#23,2,test_cases/day23_test1.txt,44169
+#23,2,day23_input.txt,48676
