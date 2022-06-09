@@ -328,13 +328,13 @@ namespace Day23
                     over_steps = abs(target_col - it->first.second);
                 }
                 m_best_total_cost += (step_cost * (up_steps + over_steps + down_steps));
-                cout << "Moving " << ch << " from " << it->first.first << "," << it->first.second 
-                     << " to " << SMALL_BOTTOM_ROW << "," << target_col 
-                     << " takes " << (up_steps + down_steps + over_steps) << " steps and costs " << (step_cost * (up_steps + over_steps + down_steps)) << endl;
+//                cout << "Moving " << ch << " from " << it->first.first << "," << it->first.second 
+//                     << " to " << SMALL_BOTTOM_ROW << "," << target_col 
+//                     << " takes " << (up_steps + down_steps + over_steps) << " steps and costs " << (step_cost * (up_steps + over_steps + down_steps)) << endl;
             }
         }
         m_best_total_cost -= ((COST_A + COST_B + COST_C + COST_D)*1); // subtract the one step for cols A,B,C, and D for the top row
-        cout << "Best total cost is " << m_best_total_cost << " after adding all of the steps to current position cost " << m_cost << endl;
+//        cout << "Best total cost is " << m_best_total_cost << " after adding all of the steps to current position cost " << m_cost << endl;
     }
     
     Position * SmallPosition::create(Board * board, int cost)
@@ -399,8 +399,7 @@ namespace Day23
                 {
                     best = pos->second;
                 }
-                else if ((pos->second->get_num_final() > best->get_num_final()) ||
-                         (pos->second->get_cost() < best->get_cost()))
+                else if ((pos->second->get_best_total_cost() < best->get_best_total_cost()))
                 {
                     best = pos->second;
                 }
@@ -531,13 +530,14 @@ void AocDay23::work_positions(MoveIndex & index, Positions & positions, map<int,
         location_rows[num_locations] = loca_pos->second.first;
         location_cols[num_locations] = loca_pos->second.second;
         num_locations++;
+        ++loca_pos;
     }
     
     while (position != NULL)
     {
         Board * board = position->get_board();
         string rep = board->get_representation();
-        cout << "Working position with cost " << position->get_cost() << " and final " << position->get_num_final() << " and board " << rep << endl;
+        cout << "Working position with cost " << position->get_cost() << " and best cost " << position->get_best_total_cost() << " and board " << rep << endl;
         if (position->is_final()) // no need to go further
         {
             return;
