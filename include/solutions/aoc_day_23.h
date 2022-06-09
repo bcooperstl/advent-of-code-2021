@@ -125,6 +125,7 @@ namespace Day23
         protected:
             Board * m_board;
             int m_cost;
+            int m_best_total_cost;
             bool m_worked;
             int m_num_final;
         public:
@@ -135,10 +136,12 @@ namespace Day23
             void set_worked(bool worked);
             int get_cost();
             void update_cost(int cost);
+            int get_best_total_cost();
             Board * get_board();
             virtual Position * create(Board * board, int cost) = 0; // this is so ugly
             void set_num_final(int num_final);
             int get_num_final();
+            virtual void set_best_total_cost() = 0;
     };
     
     class SmallPosition : public Position
@@ -149,6 +152,7 @@ namespace Day23
             virtual ~SmallPosition();
             virtual bool is_final();
             virtual Position * create(Board * board, int cost);
+            virtual void set_best_total_cost();
     };
     
     class Positions

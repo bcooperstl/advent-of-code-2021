@@ -175,7 +175,7 @@ namespace Day23
         map<int, pair<int, int>>::iterator pos = index.begin();
         while (pos != index.end())
         {
-            m_lookup[pos->second.second][pos->second.first] = pos->first;
+            m_lookup[pos->second.first][pos->second.second] = pos->first;
             ++pos;
         }
     }
@@ -201,13 +201,12 @@ namespace Day23
             move_type = MOVE_TYPE_COL_TO_HALL;
         }
         
-        map<pair<int, int>, int> index = AocDay23::get_smallboard_index();
         cout << "move type " << move_type << endl;
         cout << "Adding move of anthro " << move.anthro << " from " << move.from_row << "," << move.from_col
              << " to " << move.to_row << "," << move.to_col 
              << " with " << move.steps << " steps and " << move.cost << " cost" 
              << " and mask set to [" << move.move_mask << "]" << endl;
-        m_moves[move_type][move.anthro-ANTHRO_A][index[make_pair(move.from_row,move.from_col)]].push_back(move);
+        m_moves[move_type][move.anthro-ANTHRO_A][m_lookup[move.from_row][move.from_col]].push_back(move);
         
     }
     
@@ -246,6 +245,7 @@ namespace Day23
         {
             cout << "WARNING...raising cost...you probably don't want to do this" << endl;
         }
+        set_best_total_cost();
     }
     
     Board * Position::get_board()
@@ -263,8 +263,14 @@ namespace Day23
         m_num_final = num_final;
     }
     
+    int Position::get_best_total_cost()
+    {
+        return m_best_total_cost;
+    }
+    
     SmallPosition::SmallPosition(SmallBoard * board, int cost):Position(board, cost)
     {
+        set_best_total_cost();
     }
     
     SmallPosition::~SmallPosition()
@@ -274,6 +280,61 @@ namespace Day23
     bool SmallPosition::is_final()
     {
         return (m_num_final == NUM_SMALL_ANTHROS);
+    }
+    
+    void SmallPosition::set_best_total_cost()
+    {
+        m_best_total_cost = m_cost;
+        
+        map<pair<int, int>, int> index = AocDay23::get_smallboard_index();
+        for (map<pair<int, int>,int>::iterator it = index.begin(); it != index.end(); ++it)
+        {
+            char ch = m_board->get(it->first.first, it->first.second);
+            int step_cost = 0;
+            int target_col = 0;
+            int up_steps = 0;
+            int over_steps = 0;
+            int down_steps = 0;
+            switch (ch)
+            {
+                case 'A':
+                    step_cost = COST_A;
+                    target_col = COL_A;
+                    break;
+                case 'B':
+                    step_cost = COST_B;
+                    target_col = COL_B;
+                    break;
+                case 'C':
+                    step_cost = COST_C;
+                    target_col = COL_C;
+                    break;
+                case 'D':
+                    step_cost = COST_D;
+                    target_col = COL_D;
+                    break;
+            }
+            if (step_cost > 0)
+            {
+                if (it->first.second == target_col)
+                {
+                    // already in the target column. just move it to the bottom
+                    down_steps = SMALL_BOTTOM_ROW - it->first.first;
+                }
+                else
+                {
+                    up_steps = it->first.first - HALLWAY_ROW;
+                    down_steps = SMALL_BOTTOM_ROW - HALLWAY_ROW;
+                    over_steps = abs(target_col - it->first.second);
+                }
+                m_best_total_cost += (step_cost * (up_steps + over_steps + down_steps));
+                cout << "Moving " << ch << " from " << it->first.first << "," << it->first.second 
+                     << " to " << SMALL_BOTTOM_ROW << "," << target_col 
+                     << " takes " << (up_steps + down_steps + over_steps) << " steps and costs " << (step_cost * (up_steps + over_steps + down_steps)) << endl;
+            }
+        }
+        m_best_total_cost -= ((COST_A + COST_B + COST_C + COST_D)*1); // subtract the one step for cols A,B,C, and D for the top row
+        cout << "Best total cost is " << m_best_total_cost << " after adding all of the steps to current position cost " << m_cost << endl;
     }
     
     Position * SmallPosition::create(Board * board, int cost)
