@@ -15,17 +15,13 @@
 
 #define NUM_INPUTS 14
 
+#define W 0
+#define X 1
+#define Y 2
+#define Z 3
+
 namespace Day24
 {
-    struct FullState
-    {
-        long w;
-        long x;
-        long y;
-        long z;
-        void display();
-    };
-    
     // every input is put in w, and then x is immedilately set to 0. so y and z are all we need for this simple state
     struct SimpleState
     {
@@ -34,28 +30,52 @@ namespace Day24
         void display();
     };
     
-    struct Path
+    class CompState
     {
-        int depth;
-        bool to_here[NUM_INPUTS][10]; // only care about 1-9; will make it 10 for ease
-        void display();
+        private:
+            long m_variables[4]; // W,X,Y,Z
+            long m_next_input;
+        public:
+            CompState(long next_input);
+            CompState(SimpleState simple, long next_input);
+            ~CompState();
+            long get(int which);
+            SimpleState get_simple_state();
+            void set(int which, long value);
+            void display();
+            void do_input(int a);
+            void do_add_variable(int a, int b);
+            void do_add_constant(int a, long value);
+            void do_multiply_variable(int a, int b);
+            void do_multiply_constant(int a, long value);
+            void do_divide_variable(int a, int b);
+            void do_divide_constant(int a, long value);
+            void do_modulo_variable(int a, int b);
+            void do_modulo_constant(int a, long value);
+            void do_equals_variable(int a, int b);
+            void do_equals_constant(int a, long value);
     };
     
-    struct Combination
+    
+    struct PathStep
     {
         SimpleState state;
-        vector<Path> paths;
+        PathStep * next_steps[10]; // will only use 1-9;
+        int depth;
         void display();
     };
     
     struct Instruction
     {
         string type;
-        char dest;
-        char source_char;
+        int dest;
+        int source_char;
         long source_val;
         bool use_source_char;
         void display();
+        char get_letter(int which);
+        int get_value(char ch);
+        
     };
 }
 
@@ -66,8 +86,6 @@ class AocDay24 : public AocDay
     private:
         void parse_input(string filename, vector<Instruction> & instructions);
         void split_instructions(vector<Instruction> & all, vector<vector<Instruction>> & split);
-        void run_instruction(Instruction inst, FullState & state, int next_input);
-        void work_combinations(vector<Combination> initial, vector<Combination> & results, vector<Instruction> instructions);
     public:
         AocDay24();
         ~AocDay24();
