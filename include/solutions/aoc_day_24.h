@@ -28,6 +28,7 @@ namespace Day24
         long y;
         long z;
         void display();
+        bool operator == (const SimpleState & other);
     };
     
     class CompState
@@ -57,21 +58,41 @@ namespace Day24
     };
     
     
-    struct PathStep
+    class PathStep
     {
-        SimpleState state;
-        PathStep * next_steps[10]; // will only use 1-9;
-        int depth;
-        void display();
+        private:
+            SimpleState m_state;
+            PathStep * m_next_steps[9]; // corresponds for 1-9
+            int m_depth;
+        public:
+            PathStep(int depth, SimpleState state);
+            ~PathStep();
+            void set_next(int which, PathStep * next);
+            SimpleState get_state();
+            int get_depth();
+            PathStep * get_next(int which);
+            void display();
+    };
+    
+    class PathCache
+    {
+        // starting with map from y to a vector. could go to map from y to a map from z to the item if need speedup
+        private:
+            map<int, map<int, PathStep *>> m_paths; // go from y value to a vector of those with that y value
+        public:
+            PathCache();
+            ~PathCache();
+            void put(PathStep * step);
+            PathStep * get(SimpleState state);
     };
     
     struct Instruction
     {
         string type;
         int dest;
-        int source_char;
+        int source_var;
         long source_val;
-        bool use_source_char;
+        bool use_source_var;
         void display();
         char get_letter(int which);
         int get_value(char ch);
@@ -86,6 +107,7 @@ class AocDay24 : public AocDay
     private:
         void parse_input(string filename, vector<Instruction> & instructions);
         void split_instructions(vector<Instruction> & all, vector<vector<Instruction>> & split);
+        void work_section(vector<PathStep *> & from, vector<PathStep *> & to, vector<Instruction> instructions);
     public:
         AocDay24();
         ~AocDay24();

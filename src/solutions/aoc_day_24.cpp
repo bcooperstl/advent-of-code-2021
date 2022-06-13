@@ -19,6 +19,11 @@ namespace Day24
         cout << "y = " << y << " z = " << z << endl;
     }
     
+    bool SimpleState::operator == (const SimpleState & other)
+    {
+        return (y == other.y && z == other.z);
+    }
+    
     CompState::CompState(long next_input)
     {
         m_next_input = next_input;
@@ -146,11 +151,87 @@ namespace Day24
         m_variables[a] = (m_variables[a] == value ? 1 : 0);
     }
     
+    
+    PathStep::PathStep(int depth, SimpleState state)
+    {
+        m_depth = depth;
+        m_state = state;
+        for (int i=0; i<9; i++)
+        {
+            m_next_steps[i] = NULL;
+        }
+    }
+    
+    PathStep::~PathStep()
+    {
+    }
+    
+    // expects which to be from 1-9
+    void PathStep::set_next(int which, PathStep * next)
+    {
+        m_next_steps[which-1] = next;
+    }
+    
+    SimpleState PathStep::get_state()
+    {
+        return m_state;
+    }
+    
+    int PathStep::get_depth()
+    {
+        return m_depth;
+    }
+    
+    PathStep * PathStep::get_next(int which)
+    {
+        return m_next_steps[which];
+    }
+    
     void PathStep::display()
     {
-        cout << "Path has depth " << depth << " with state: ";
-        state.display();
+        cout << "Path has depth " << m_depth << " with state: ";
+        m_state.display();
     }
+    
+    PathCache::PathCache()
+    {
+    }
+    
+    PathCache::~PathCache()
+    {
+    }
+    
+    void PathCache::put(PathStep * step)
+    {
+        SimpleState state = step->get_state();
+        map<int, map<int, PathStep *>>::iterator pos_y = m_paths.find(state.y);
+        if (pos_y == m_paths.end())
+        {
+            map<int, PathStep *> next;
+            next[state.z] = step;
+            m_paths[state.y] = next;
+        }
+        else
+        {
+            pos_y->second[state.z] = step;
+        }
+    }
+    
+    PathStep * PathCache::get(SimpleState state)
+    {
+        map<int, map<int, PathStep *>>::iterator pos_y = m_paths.find(state.y);
+        if (pos_y == m_paths.end())
+        {
+            return NULL;
+        }
+        map<int, PathStep *>::iterator pos_z = pos_y->second.find(state.z);
+        if (pos_z == pos_y->second.end())
+        {
+            return NULL;
+        }
+        return pos_z->second;
+    }
+    
     
     char Instruction::get_letter(int which)
     {
@@ -188,9 +269,9 @@ namespace Day24
     {
         if (type != INPUT)
         {
-            if (use_source_char)
+            if (use_source_var)
             {
-                cout << "Operation " << type << " to " << get_letter(dest) << " from " << get_letter(source_char) << endl;
+                cout << "Operation " << type << " to " << get_letter(dest) << " from " << get_letter(source_var) << endl;
             }
             else
             {
@@ -234,13 +315,13 @@ void AocDay24::parse_input(string filename, vector<Instruction> & instructions)
             char ch = lines[i][2][0]; // get the first character, then check it
             if (ch == 'w' || ch == 'x' || ch == 'y' || ch == 'z')
             {
-                inst.use_source_char = true;
-                inst.source_char = inst.get_value(ch);
-                cout << "Operation " << inst.type << " to " << inst.get_letter(inst.dest) << " from " << inst.get_letter(inst.source_char) << endl;
+                inst.use_source_var = true;
+                inst.source_var = inst.get_value(ch);
+                cout << "Operation " << inst.type << " to " << inst.get_letter(inst.dest) << " from " << inst.get_letter(inst.source_var) << endl;
             }
             else
             {
-                inst.use_source_char = false;
+                inst.use_source_var = false;
                 inst.source_val = strtol(lines[i][2].c_str(), NULL, 10);
                 cout << "Operation " << inst.type << " to " << inst.get_letter(inst.dest) << " with value " << inst.source_val << endl;
             
@@ -270,6 +351,152 @@ void AocDay24::split_instructions(vector<Instruction>&  all, vector<vector<Instr
     split.push_back(current); // get the last one
 }
 
+void AocDay24::work_section(vector<PathStep *> & from, vector<PathStep *> & to, vector<Instruction> instructions)
+{
+    int depth = from[0]->get_depth();
+    int total_comps = from.size() * 9;
+    if (from.size() > 0)
+    {
+        cout << "Working " << from.size() << " paths from depth " << depth << " resulting in " << total_comps << " computers" << endl;
+    }
+    CompState ** comps = new CompState *[total_comps];
+    for (int i=0; i<from.size(); i++)
+    {
+        for (int j=0; j<9; j++)
+        {
+            comps[9*i+j] = new CompState(from[i]->get_state(), j+1); // need j from 0 to 8 for array placement, but 1 to 9 for next value
+        }
+    }
+    
+    for (int i=0; i<instructions.size(); i++)
+    {
+        // i know this looks backwards, but i don't want to re-evaluate the instruction comparison 100,000 times per instruction, so i'll repeat the loop inside it
+        if (instructions[i].type == INPUT)
+        {
+            cout << "Input" << endl;
+            for (int j=0; j<total_comps; j++)
+            {
+                comps[j]->do_input(instructions[i].dest);
+            }
+        }
+        else if (instructions[i].type == ADD)
+        {
+            if (instructions[i].use_source_var)
+            {
+                cout << "Add by variable" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_add_variable(instructions[i].dest, instructions[i].source_var);
+                }
+            }
+            else
+            {
+                cout << "Add by constant" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_add_constant(instructions[i].dest, instructions[i].source_val);
+                }
+            }                
+        }            
+        else if (instructions[i].type == MULTIPLY)
+        {
+            if (instructions[i].use_source_var)
+            {
+                cout << "Multiply by variable" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_multiply_variable(instructions[i].dest, instructions[i].source_var);
+                }
+            }
+            else
+            {
+                cout << "Multiply by constant" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_multiply_constant(instructions[i].dest, instructions[i].source_val);
+                }
+            }                
+        }            
+        else if (instructions[i].type == DIVIDE)
+        {
+            if (instructions[i].use_source_var)
+            {
+                cout << "Divide by variable" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_divide_variable(instructions[i].dest, instructions[i].source_var);
+                }
+            }
+            else
+            {
+                cout << "Add by constant" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_divide_constant(instructions[i].dest, instructions[i].source_val);
+                }
+            }                
+        }            
+        else if (instructions[i].type == MODULO)
+        {
+            if (instructions[i].use_source_var)
+            {
+                cout << "Modulo by variable" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_modulo_variable(instructions[i].dest, instructions[i].source_var);
+                }
+            }
+            else
+            {
+                cout << "Modulo by constant" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_modulo_constant(instructions[i].dest, instructions[i].source_val);
+                }
+            }                
+        }            
+        else if (instructions[i].type == EQUAL)
+        {
+            if (instructions[i].use_source_var)
+            {
+                cout << "Equals by variable" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_equals_variable(instructions[i].dest, instructions[i].source_var);
+                }
+            }
+            else
+            {
+                cout << "Equals by constant" << endl;
+                for (int j=0; j<total_comps; j++)
+                {
+                    comps[j]->do_equals_constant(instructions[i].dest, instructions[i].source_val);
+                }
+            }                
+        }            
+    }
+    
+    PathCache cache;
+    // now accumlulate the results;
+    for (int i=0; i<total_comps; i++)
+    {
+        SimpleState state = comps[i]->get_simple_state();
+        PathStep * next = cache.get(state);
+        
+        if (next == NULL)
+        {
+            next = new PathStep(depth + 1, state);
+            //cout << "Created PathStep ";
+            //next->display();
+            to.push_back(next);
+            cache.put(next);
+        }
+        from[i/9]->set_next((i%9) + 1, next); // the set_next function expects the first paramter to be from 1-9
+        delete comps[i]; // done with it
+    }
+    delete [] comps;
+}
+
 string AocDay24::part1(string filename, vector<string> extra_args)
 {
     vector<Instruction> all;
@@ -282,7 +509,25 @@ string AocDay24::part1(string filename, vector<string> extra_args)
     initial_state.y = 0;
     initial_state.z = 0;
     
+    vector<PathStep *> options[15];
+    PathStep * initial = new PathStep(0, initial_state);
+    options[0].push_back(initial);
+    
     ostringstream out;
     out << split.size();
+    
+    for (int i=0; i<15; i++)
+    {
+        work_section(options[i], options[i+1], split[i]);
+    }
+    
+    for (int i=0; i<15; i++)
+    {
+        for (int j=0; j<options[i].size(); i++)
+        {
+            delete options[i][j];
+        }
+    }
+    
     return out.str();
 }
