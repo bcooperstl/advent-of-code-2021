@@ -63,18 +63,18 @@ namespace Day24
     {
         private:
             SimpleState m_state;
-            PathStep * m_next_steps[9]; // corresponds for 1-9
             int m_depth;
-            long m_best_to_here;
+            long m_highest_to_here;
+            long m_lowest_to_here;
         public:
             PathStep(int depth, SimpleState state);
             ~PathStep();
-            void set_next(int which, PathStep * next);
             SimpleState get_state();
             int get_depth();
-            PathStep * get_next(int which);
-            long get_best_to_here();
-            void set_best_to_here(long best_to_here);
+            long get_highest_to_here();
+            void set_highest_to_here(long highest_to_here);
+            long get_lowest_to_here();
+            void set_lowest_to_here(long lowest_to_here);
             void display();
     };
     
@@ -115,7 +115,7 @@ class AocDay24 : public AocDay
         AocDay24();
         ~AocDay24();
         string part1(string filename, vector<string> extra_args);
-        //string part2(string filename, vector<string> extra_args);
+        string part2(string filename, vector<string> extra_args);
 };
 
 #endif

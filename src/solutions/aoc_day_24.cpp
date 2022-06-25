@@ -169,21 +169,12 @@ namespace Day24
     {
         m_depth = depth;
         m_state = state;
-        for (int i=0; i<9; i++)
-        {
-            m_next_steps[i] = NULL;
-        }
-        m_best_to_here = 0;
+        m_highest_to_here = 0;
+        m_lowest_to_here = 0;
     }
     
     PathStep::~PathStep()
     {
-    }
-    
-    // expects which to be from 1-9
-    void PathStep::set_next(int which, PathStep * next)
-    {
-        m_next_steps[which-1] = next;
     }
     
     SimpleState PathStep::get_state()
@@ -196,21 +187,26 @@ namespace Day24
         return m_depth;
     }
     
-    PathStep * PathStep::get_next(int which)
+    long PathStep::get_highest_to_here()
     {
-        return m_next_steps[which];
+        return m_highest_to_here;
     }
     
-    long PathStep::get_best_to_here()
+    void PathStep::set_highest_to_here(long highest_to_here)
     {
-        return m_best_to_here;
+        m_highest_to_here = highest_to_here;
     }
     
-    void PathStep::set_best_to_here(long best_to_here)
+    long PathStep::get_lowest_to_here()
     {
-        m_best_to_here = best_to_here;
+        return m_lowest_to_here;
     }
     
+    void PathStep::set_lowest_to_here(long lowest_to_here)
+    {
+        m_lowest_to_here = lowest_to_here;
+    }
+
     void PathStep::display()
     {
         cout << "Path has depth " << m_depth << " with state: ";
@@ -529,14 +525,19 @@ void AocDay24::work_section(vector<PathStep *> & from, vector<PathStep *> & to, 
                     to.push_back(next);
                     cache.put(next);
                 }
-                from[from_low + (i/9)]->set_next((i%9) + 1, next); // the set_next function expects the first paramter to be from 1-9
-                
-                long current_path = (from[from_low + (i/9)]->get_best_to_here() * 10l) + ((long)((i%9) + 1));
-                //cout << "Current path is " << current_path << endl;
-                if (current_path > next->get_best_to_here())
+                long current_high_path = (from[from_low + (i/9)]->get_highest_to_here() * 10l) + ((long)((i%9) + 1));
+                //cout << "Current path is " << current_high_path << endl;
+                if (current_high_path > next->get_highest_to_here())
                 {
-                    //cout << " updated best_to_here from " << next->get_best_to_here() << " to " << current_path << endl;
-                    next->set_best_to_here(current_path);
+                    //cout << " updated highest_to_here from " << next->get_highest_to_here() << " to " << current_high_path << endl;
+                    next->set_highest_to_here(current_high_path);
+                }
+                
+                long current_low_path = (from[from_low + (i/9)]->get_lowest_to_here() * 10l) + ((long)((i%9) + 1));
+                if ((next->get_lowest_to_here() == 0) || (current_low_path < next->get_lowest_to_here()))
+                {
+                    //cout << " updated lowest_to_here from " << next->get_lowest_to_here() << " to " << current_low_path << endl;
+                    next->set_lowest_to_here(current_low_path);
                 }
             }
         }
@@ -566,7 +567,41 @@ string AocDay24::part1(string filename, vector<string> extra_args)
         
     cout << "Options[14] has " << options[14].size() << " elements" << endl;
     ostringstream out;
-    out << options[14][0]->get_best_to_here();
+    out << options[14][0]->get_highest_to_here();
+    for (int i=0; i<=14; i++)
+    {
+        for (int j=0; j<options[i].size(); j++)
+        {
+            delete options[i][j];
+        }
+    }
+    
+    return out.str();
+}
+
+string AocDay24::part2(string filename, vector<string> extra_args)
+{
+    vector<Instruction> all;
+    vector<vector<Instruction>> split;
+    
+    parse_input(filename, all);
+    split_instructions(all, split);
+    
+    SimpleState initial_state;
+    initial_state.z = 0;
+    
+    vector<PathStep *> options[15];
+    PathStep * initial = new PathStep(0, initial_state);
+    options[0].push_back(initial);
+    
+    for (int i=0; i<14; i++)
+    {
+        work_section(options[i], options[i+1], split[i]);
+    }
+        
+    cout << "Options[14] has " << options[14].size() << " elements" << endl;
+    ostringstream out;
+    out << options[14][0]->get_lowest_to_here();
     for (int i=0; i<=14; i++)
     {
         for (int j=0; j<options[i].size(); j++)
