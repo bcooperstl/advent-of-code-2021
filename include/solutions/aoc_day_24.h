@@ -65,6 +65,7 @@ namespace Day24
             SimpleState m_state;
             PathStep * m_next_steps[9]; // corresponds for 1-9
             int m_depth;
+            long m_best_to_here;
         public:
             PathStep(int depth, SimpleState state);
             ~PathStep();
@@ -72,6 +73,8 @@ namespace Day24
             SimpleState get_state();
             int get_depth();
             PathStep * get_next(int which);
+            long get_best_to_here();
+            void set_best_to_here(long best_to_here);
             void display();
     };
     
@@ -108,7 +111,6 @@ class AocDay24 : public AocDay
         void parse_input(string filename, vector<Instruction> & instructions);
         void split_instructions(vector<Instruction> & all, vector<vector<Instruction>> & split);
         void work_section(vector<PathStep *> & from, vector<PathStep *> & to, vector<Instruction> instructions);
-        void cleanup_section(vector<PathStep *> & from, vector<PathStep *> & to);
     public:
         AocDay24();
         ~AocDay24();

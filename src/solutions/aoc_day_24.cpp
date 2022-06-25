@@ -173,6 +173,7 @@ namespace Day24
         {
             m_next_steps[i] = NULL;
         }
+        m_best_to_here = 0;
     }
     
     PathStep::~PathStep()
@@ -198,6 +199,16 @@ namespace Day24
     PathStep * PathStep::get_next(int which)
     {
         return m_next_steps[which];
+    }
+    
+    long PathStep::get_best_to_here()
+    {
+        return m_best_to_here;
+    }
+    
+    void PathStep::set_best_to_here(long best_to_here)
+    {
+        m_best_to_here = best_to_here;
     }
     
     void PathStep::display()
@@ -519,51 +530,18 @@ void AocDay24::work_section(vector<PathStep *> & from, vector<PathStep *> & to, 
                     cache.put(next);
                 }
                 from[from_low + (i/9)]->set_next((i%9) + 1, next); // the set_next function expects the first paramter to be from 1-9
+                
+                long current_path = (from[from_low + (i/9)]->get_best_to_here() * 10l) + ((long)((i%9) + 1));
+                //cout << "Current path is " << current_path << endl;
+                if (current_path > next->get_best_to_here())
+                {
+                    //cout << " updated best_to_here from " << next->get_best_to_here() << " to " << current_path << endl;
+                    next->set_best_to_here(current_path);
+                }
             }
         }
     }
     delete [] comps;
-}
-
-void AocDay24::cleanup_section(vector<PathStep *> & from, vector<PathStep *> & to)
-{
-    vector<PathStep *>::iterator from_pos = from.begin();
-    int counter = 0;
-    while (from_pos != from.end())
-    {
-        cout << " at " << counter << endl;
-        ++counter;
-        PathStep * from_step = *from_pos;
-        bool any_good = false;
-        for (int j=1; j<=9; j++)
-        {
-            PathStep * to_step = from_step->get_next(j);
-            bool to_good = false;
-            for (int i=0; i<to.size(); i++)
-            {
-                if (to_step == to[i])
-                {
-                    to_good = true;
-                    any_good = true;
-                    break;
-                }
-            }
-            if (!to_good)
-            {
-                from_step->set_next(j, NULL);
-            }
-        }
-        if (any_good)
-        {
-            cout << "GOT SOMETHING GOOD" << endl;
-            ++from_pos;
-        }
-        else
-        {
-            delete from_step;
-            from_pos=from.erase(from_pos);
-        }
-    }
 }
                 
 string AocDay24::part1(string filename, vector<string> extra_args)
@@ -581,28 +559,20 @@ string AocDay24::part1(string filename, vector<string> extra_args)
     PathStep * initial = new PathStep(0, initial_state);
     options[0].push_back(initial);
     
-    ostringstream out;
-    out << split.size();
-    
     for (int i=0; i<14; i++)
     {
         work_section(options[i], options[i+1], split[i]);
     }
         
-    for (int i=0; i<14; i++)
+    cout << "Options[14] has " << options[14].size() << " elements" << endl;
+    ostringstream out;
+    out << options[14][0]->get_best_to_here();
+    for (int i=0; i<=14; i++)
     {
         for (int j=0; j<options[i].size(); j++)
         {
             delete options[i][j];
         }
-    }
-    
-    cout << "Options[14] has " << options[14].size() << " elements" << endl;
-    for (int i=13; i>=0; i--)
-    {
-        cout << "Prior to cleanup, options " << i << " has " << options[i].size() << " elements" << endl;
-        cleanup_section(options[i], options[i+1]);
-        cout << "After cleanup, options " << i << " has " << options[i].size() << " elements" << endl;
     }
     
     return out.str();
