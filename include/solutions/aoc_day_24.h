@@ -25,7 +25,6 @@ namespace Day24
     // every input is put in w, and then x is immedilately set to 0. so y and z are all we need for this simple state
     struct SimpleState
     {
-        long y;
         long z;
         void display();
         bool operator == (const SimpleState & other);
@@ -37,11 +36,13 @@ namespace Day24
             long m_variables[4]; // W,X,Y,Z
             long m_next_input;
         public:
+            CompState();
             CompState(long next_input);
             CompState(SimpleState simple, long next_input);
             ~CompState();
             long get(int which);
             SimpleState get_simple_state();
+            void reset(SimpleState simple, long next_input);
             void set(int which, long value);
             void display();
             void do_input(int a);
@@ -76,9 +77,8 @@ namespace Day24
     
     class PathCache
     {
-        // starting with map from y to a vector. could go to map from y to a map from z to the item if need speedup
         private:
-            map<int, map<int, PathStep *>> m_paths; // go from y value to a vector of those with that y value
+            map<int, PathStep *> m_paths; // go from z value to the PathStep with that z value
         public:
             PathCache();
             ~PathCache();
