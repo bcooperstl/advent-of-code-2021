@@ -525,6 +525,47 @@ void AocDay24::work_section(vector<PathStep *> & from, vector<PathStep *> & to, 
     delete [] comps;
 }
 
+void AocDay24::cleanup_section(vector<PathStep *> & from, vector<PathStep *> & to)
+{
+    vector<PathStep *>::iterator from_pos = from.begin();
+    int counter = 0;
+    while (from_pos != from.end())
+    {
+        cout << " at " << counter << endl;
+        ++counter;
+        PathStep * from_step = *from_pos;
+        bool any_good = false;
+        for (int j=1; j<=9; j++)
+        {
+            PathStep * to_step = from_step->get_next(j);
+            bool to_good = false;
+            for (int i=0; i<to.size(); i++)
+            {
+                if (to_step == to[i])
+                {
+                    to_good = true;
+                    any_good = true;
+                    break;
+                }
+            }
+            if (!to_good)
+            {
+                from_step->set_next(j, NULL);
+            }
+        }
+        if (any_good)
+        {
+            cout << "GOT SOMETHING GOOD" << endl;
+            ++from_pos;
+        }
+        else
+        {
+            delete from_step;
+            from_pos=from.erase(from_pos);
+        }
+    }
+}
+                
 string AocDay24::part1(string filename, vector<string> extra_args)
 {
     vector<Instruction> all;
@@ -554,6 +595,14 @@ string AocDay24::part1(string filename, vector<string> extra_args)
         {
             delete options[i][j];
         }
+    }
+    
+    cout << "Options[14] has " << options[14].size() << " elements" << endl;
+    for (int i=13; i>=0; i--)
+    {
+        cout << "Prior to cleanup, options " << i << " has " << options[i].size() << " elements" << endl;
+        cleanup_section(options[i], options[i+1]);
+        cout << "After cleanup, options " << i << " has " << options[i].size() << " elements" << endl;
     }
     
     return out.str();
