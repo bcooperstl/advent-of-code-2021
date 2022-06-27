@@ -27,6 +27,7 @@
 #include "aoc_day_22.h"
 #include "aoc_day_23.h"
 #include "aoc_day_24.h"
+#include "aoc_day_25.h"
 
 using namespace std;
 
@@ -57,6 +58,7 @@ AocDays::AocDays()
     m_days[22]=new AocDay22();
     m_days[23]=new AocDay23();
     m_days[24]=new AocDay24();
+    m_days[25]=new AocDay25();
 }
 
 AocDays::~AocDays()
